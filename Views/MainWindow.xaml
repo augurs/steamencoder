@@ -1,0 +1,624 @@
+﻿<Window x:Class="EncoderApp.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EncoderApp.Views"
+        mc:Ignorable="d"
+        Title="Encoder App"
+        Width="800" Height="650"  
+        MinWidth="720" MinHeight="720"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResize"
+        Icon="/Images/EncoderAppIcon.ico">
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Grid>
+                <Border x:Name="Header" Height="40" Background="#0b1220" MouseDown="Header_MouseDown" VerticalAlignment="Top">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                            <Image Source="/Images/EncoderAppIcon.ico" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="TitleText" Text="Encoder App" Foreground="#94a3b8" FontWeight="Bold" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Focusable" Value="False"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#1a1f33"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Background" Value="#25304a"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button x:Name="MinimizeButton" Click="MinimizeButton_Click" Width="40" Height="40">
+                                <TextBlock Text="__" FontSize="11" Foreground="#94a3b8" FontWeight="Bold"
+                                           Margin="0,-10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+                            <Button x:Name="MaximizeButton" Click="MaximizeButton_Click" Width="40" Height="40">
+                                <Image Source="/Images/maximize.png" Width="14" Height="12"/>
+                            </Button>
+                            <Button x:Name="CloseButton" Click="CloseButton_Click" Width="40" Height="40">
+                                <Image Source="/Images/close.png" Width="15" Height="16"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <ContentPresenter Margin="0,40,0,0"/>
+            </Grid>
+        </ControlTemplate>
+    </Window.Template>
+    <Window.Resources>
+        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+            <Style.Triggers>
+                <Trigger Property="Role" Value="TopLevelHeader">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="MenuItem">
+                                <Grid>
+                                    <Border x:Name="HoverBorder" Background="Transparent" Cursor="Hand">
+                                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center" Margin="10,0" />
+                                    </Border>
+                                    <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" StaysOpen="False">
+                                        <Border Background="#0f1724" BorderBrush="Gray" BorderThickness="0">
+                                            <StackPanel>
+                                                <ItemsPresenter/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Popup>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="HoverBorder" Property="Background" Value="#2d343f"/>
+                                        <Setter TargetName="HoverBorder" Property="BorderThickness" Value="1"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="HoverButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1.05" Duration="0:0:0.1"/>
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1.05" Duration="0:0:0.1"/>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Effect">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <DropShadowEffect Color="#888888" BlurRadius="10" ShadowDepth="4" Direction="270"/>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.1"/>
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.1"/>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Effect">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Null}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#ad5c4a"/>
+                                <Setter Property="Foreground" Value="#66FFFFFF"/>
+                                <Setter TargetName="border" Property="Effect" Value="{x:Null}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="Transparent"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="BorderThickness" Value="1"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#666666" BlurRadius="6" ShadowDepth="2" Direction="270"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopBorderHeadingStyle" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DarkButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                           Background="{TemplateBinding Background}" 
+                           BorderBrush="{TemplateBinding BorderBrush}" 
+                           CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980b9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1f6391"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#777"/>
+                                <Setter TargetName="border" Property="Background" Value="#333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DarkCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource DarkButtonStyle}">
+            <Setter Property="Background" Value="#212a3b"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#071024" Offset="0"/>
+                <GradientStop Color="#071432" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0" Margin="0,0,0,0" Background="#131d2f">
+                <Menu DockPanel.Dock="Top" VerticalAlignment="Center" Foreground="#94a3b8" Background="#131d2f">
+                    <MenuItem Header="File" Height="20" >
+                        <MenuItem Header="Broadcast Wizard" InputGestureText="Ctrl+N" />
+                        <Separator/>
+                        <MenuItem Header="New Broadcast Project" />
+                        <MenuItem Header="Open Broadcast Project" InputGestureText="Ctrl+O" />
+                        <Separator/>
+                        <MenuItem Header="Save Broadcast Project" InputGestureText="Ctrl+S"/>
+                        <MenuItem Header="Save Broadcast Project As"/>
+                        <Separator/>
+                        <MenuItem Header="Recent Broadcast Projects">
+                            <MenuItem Header="Project 1"/>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Exit"/>
+                    </MenuItem>
+                    <MenuItem Header="Broadcast">
+                        <MenuItem Header="Streams" Click="Streams_Click"/>
+                        <MenuItem Header="Metadat Capture"/>
+                        <Separator/>
+                        <MenuItem Header="Start Broadcast">
+                            <MenuItem.Icon>
+                                <TextBlock Text="▶" FontSize="10" Margin="0,0,5,0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Stop Broadcast">
+                            <MenuItem.Icon>
+                                <TextBlock Text="■" FontSize="10" Margin="0,0,5,0"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Split Recording Now"/>
+                        <MenuItem Header="Browse Recording "/>
+                    </MenuItem>
+                    <MenuItem Header="Options">
+                        <MenuItem Header="Preferences" Click="Preferences_Click"/>
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+            <Separator Foreground="#F0F0F5" Background="LightSlateGray" Grid.Row="1" Margin="0,0,0,2"/>
+            <StackPanel Grid.Row="2" HorizontalAlignment="Left" Margin="1,2" Orientation="Horizontal">
+
+                <Button x:Name="StartButton" Width="55" Height="45" Style="{StaticResource HoverButtonStyle}" Cursor="Hand"
+                        Margin="10,0,0,0" Background="#2F8ECB" Foreground="White" Click="StartButton_Click">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image Source="/Images/play.png" Width="30" Height="50" Margin="0,5,0,5"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="StopButton" Width="55" Height="45" Cursor="Hand" IsEnabled="False"
+                        Margin="10,0,0,0" Background="#db4637" Foreground="White" Click="StopButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource HoverButtonStyle}">
+                            <Setter Property="Opacity" Value="1" />
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                    <Setter Property="Background" Value="#542a20"/>
+                                    <Setter Property="Foreground" Value="#80FFFFFF"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image Source="/Images/stop-button.png" Width="30" Height="50" Margin="0,5,0,5"/>
+                    </StackPanel>
+                </Button>
+                <Border Width="1" Background="Gray" Margin="5,0,0,0" VerticalAlignment="Stretch"/>
+            </StackPanel>
+            <Separator Foreground="LightSlateGray" Background="LightSlateGray " Grid.Row="3" Margin="0,2,0,0"/>
+            <Grid Grid.Row="4" Margin="10,10,10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" MinWidth="250"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderBrush="#212a3b" BorderThickness="1" Margin="0,0,5,0" Background="#131d2f" CornerRadius="4">
+                    <Grid>
+                        <Border BorderBrush="White" BorderThickness="0" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,15,0">
+                            <TextBlock x:Name="TimeText" FontSize="12" Foreground="#94a3b8" Margin="0,10,0,0" 
+                                       Text="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=TimeNow,
+                                       StringFormat='MMMM dd, yyyy hh:mm tt zzz'}"/>
+                        </Border>
+                        <StackPanel Orientation="Vertical" Margin="5,45,0,0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,-40,0,0" Background="Transparent">
+                                <Image Source="/Images/status.png" Width="25" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Status" Foreground="#3498db" Margin="0,-2,5,0" FontSize="20" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <!-- On Air -->
+                            <StackPanel x:Name="OnAirPanel" Orientation="Horizontal" Margin="20,15,0,0" Height="81" Visibility="Collapsed">
+                                <Ellipse Width="55" Height="65">
+                                    <Ellipse.Fill>
+                                        <ImageBrush ImageSource="/Images/play.png" Stretch="UniformToFill"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <StackPanel Margin="20,-10,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="On Air" Margin="0,0,0,0" FontSize="30" Foreground="#94a3b8" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Broadcasting live on all streams." Foreground="#94a3b8"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <!-- Off Air -->
+                            <StackPanel x:Name="OffAirPanel" Orientation="Horizontal" Margin="20,15,0,0" Height="81" Visibility="Visible">
+                                <Ellipse Width="55" Height="55" Fill="#94a3b8"/>
+                                <StackPanel Margin="20,-10,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="Off Air" Margin="0,0,0,0" FontSize="30" Foreground="#94a3b8" FontWeight="SemiBold"/>
+                                    <TextBlock Text="All streams are disconnected." Foreground="#94a3b8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="#212a3b"  Background="#131d2f" BorderThickness="1" Padding="0" CornerRadius="4">
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,0,0,0" Background="Transparent">
+                            <Image Source="/Images/metaData.png" Width="20" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="MetaData" Foreground="#3498db" Margin="0,-2,5,0" FontSize="20" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Margin="0,10,0,0" Text="Now Playing:" FontSize="12" Foreground="#94a3b8"/>
+                        <TextBox x:Name="ArtistTextBox" FontSize="12" Height="25" Margin="0,10,0,5" Padding="5,3,0,3" MinWidth="100"
+                                     Text="Artist" Foreground="#94a3b8" Background="#0b1220" BorderThickness="0" GotFocus="ArtistTextBox_GotFocus"
+                                     LostFocus="ArtistTextBox_LostFocus">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <TextBox x:Name="TrackTitleTextBox"
+                                   FontSize="12"
+                                   Height="25"
+                                   Margin="0,10,0,8"
+                                   Padding="5,3,0,3"
+                                   MinWidth="100"
+                                   Text="Track title" 
+                                   Foreground="#94a3b8"
+                                   Background="#0b1220"
+                                   BorderThickness="0"
+                                   GotFocus="TrackTitleTextBox_GotFocus"
+                                   LostFocus="TrackTitleTextBox_LostFocus">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <Button x:Name="UpdateBtn" Style="{StaticResource HoverButtonStyle}" Content="Update" IsEnabled="False" FontSize="11" HorizontalAlignment="Right"
+                                Width="90" Height="23" Cursor="Hand" Foreground="White" Background="#229552" BorderThickness="0" Click="UpdateMetdata_Click">
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="5" Margin="10,15,5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" MinWidth="370"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderBrush="#212a3b" CornerRadius="4" Background="#131d2f" BorderThickness="1" Margin="0,0,15,0">
+                    <Grid>
+                        <Border BorderBrush="White" BorderThickness="0" Background="White" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,15,0">
+                        </Border>
+                        <StackPanel Orientation="Vertical" Margin="5,0,5,0" >
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,5,0,0" Background="Transparent">
+                                <Image Source="/Images/stream.png" Width="25" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Streams" Foreground="#3498db" Margin="0,-2,5,0" FontSize="20" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Border BorderBrush="#212a3b" BorderThickness="2" Margin="5,15,5,0" Height="295">
+                                <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl ItemsSource="{Binding Streams}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                                <Border BorderBrush="#212a3b" Height="60" BorderThickness="1" Background="#0b1220"
+                                                        Margin="5,7,5,5" Padding="10,0" CornerRadius="6" Cursor="Hand"
+                                                        MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Name}" Foreground="#94a3b8" FontSize="14" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="{Binding Mount}" Foreground="#94a3b8" FontSize="12" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                                                    VerticalAlignment="Center" Grid.Column="1" Margin="10,0,0,0">
+                                                            <Ellipse Width="10" Height="10" VerticalAlignment="Center">
+                                                                <Ellipse.Style>
+                                                                    <Style TargetType="Ellipse">
+                                                                        <Setter Property="Fill" Value="IndianRed"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                                                <Setter Property="Fill" Value="LimeGreen"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Ellipse.Style>
+                                                            </Ellipse>
+                                                            <TextBlock FontSize="13" FontWeight="SemiBold" Margin="5,0,0,0" VerticalAlignment="Center">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Text" Value="Disconnected"/>
+                                                                        <Setter Property="Foreground" Value="IndianRed"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                                                <Setter Property="Text" Value="Connected"/>
+                                                                                <Setter Property="Foreground" Value="LimeGreen"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border BorderBrush="#212a3b" CornerRadius="4" Background="#131d2f" BorderThickness="1" Padding="0" Grid.Column="2" Margin="0,0,4,0">
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,0,0,0" Background="Transparent">
+                            <Image Source="/Images/volume-Mixer.png" Width="25" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="Volume Mixer" Foreground="#3498db" Margin="0,-2,5,0" FontSize="20" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Grid Margin="0,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+                            <Border BorderBrush="#212a3b" BorderThickness="2" Padding="0" Grid.Column="0" Margin="0,10,5,0">
+                                <StackPanel Margin="10">
+                                    <TextBlock Text="Audio Input" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-5,0,0" Foreground="#3498db"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBlock Text="Volume" Foreground="#94a3b8"/>
+                                        <Slider x:Name="AudioSlider" ValueChanged="AudioSlider_ValueChanged" Minimum="0" Maximum="100" Value="50" Orientation="Vertical" VerticalAlignment="Stretch" Height="200" Margin="-35,20,0,0" TickPlacement="Both" TickFrequency="10" IsSnapToTickEnabled="True">
+                                            <Slider.Resources>
+                                                <Style TargetType="Thumb">
+                                                    <Setter Property="Background" Value="#0b1220"/>
+                                                    <Setter Property="BorderBrush" Value="White"/>
+                                                    <Setter Property="BorderThickness" Value="1"/>
+                                                </Style>
+                                                <Style TargetType="RepeatButton">
+                                                    <Setter Property="Background" Value="#0b1220"/>
+                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                </Style>
+                                            </Slider.Resources>
+                                        </Slider>
+                                        <TextBlock Text="VU Meter" Foreground="#94a3b8" Margin="30,0,0,0"/>
+                                        <Grid Width="45" Height="200" Margin="-48,20,20,0" Background="#0b1220">
+                                            <StackPanel x:Name="AudioInputVU" VerticalAlignment="Bottom" Orientation="Vertical" Margin="0" />
+                                        </Grid> 
+                                    </StackPanel>
+                                    <Grid Margin="0,10,0,10" VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="AudioDbTextBlock" Text="0 dB" FontSize="14" VerticalAlignment="Center"
+                                                   Foreground="Gray" Margin="5,0,0,0" Grid.Column="0"/>
+                                        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Padding="5"
+                                                VerticalAlignment="Center" Margin="0,0,7,0" MouseLeftButtonDown="AudioToggle_Click">
+                                            <Image x:Name="AudioToggleImage" Source="/Images/DisableSpeaker.png"
+                                                   Width="20" Height="20" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#212a3b" BorderThickness="2" Padding="0" Grid.Column="1" Margin="0,10,5,0">
+                                <StackPanel Margin="10">
+                                    <TextBlock Text="Other Applications" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-5,0,0" Foreground="#3498db"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBlock Text="Volume" Foreground="#94a3b8"/>
+                                        <Slider x:Name="OtherAppsSlider" Minimum="0" Foreground="DarkGray" Maximum="100" Value="50" 
+                                                Orientation="Vertical" VerticalAlignment="Stretch" Height="200" Margin="-35,20,0,0" 
+                                                TickPlacement="Both" TickFrequency="10" IsSnapToTickEnabled="True" 
+                                                ValueChanged="OtherAppsSlider_ValueChanged"/>
+                                        <TextBlock Text="VU Meter" Margin="30,0,0,0" Foreground="#94a3b8"/>
+                                        <Grid Width="45" Height="200" Margin="-48,20,20,0" Background="#0b1220">
+                                            <StackPanel x:Name="OtherApplicationsVU" VerticalAlignment="Bottom"/>
+                                        </Grid>
+                                    </StackPanel>
+                                    <Grid Margin="0,10,0,10" VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="OtherAppsDbTextBlock" Text="0 dB" FontSize="14" VerticalAlignment="Center" 
+                                                   Foreground="Gray" Margin="5,0,0,0" Grid.Column="0"/>
+                                        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Padding="5"
+                                                VerticalAlignment="Center" Margin="0,0,7,0" MouseLeftButtonDown="OtherAppsToggle_Click">
+                                            <Image x:Name="OtherAppsToggleImage" Source="/Images/EnableSpeaker.png" Width="20" Height="20" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#212a3b" BorderThickness="2" Padding="0" Grid.Column="2" Margin="0,10,0,0">
+                                <StackPanel Margin="10">
+                                    <TextBlock Text="Master" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-5,0,0" Foreground="#3498db"/>
+                                    <StackPanel Margin="0,10,0,0" VerticalAlignment="Top">
+                                        <TextBlock Text="VU Meter" TextAlignment="Center" VerticalAlignment="Center" Foreground="#94a3b8"/>
+                                        <Grid Width="45" Height="200" Margin="0,5,0,0" Background="#0b1220">
+                                            <StackPanel x:Name="MasterVU" VerticalAlignment="Bottom"/>
+                                        </Grid>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,10,0,0">
+                                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Padding="5" Margin="8,0,0,0" MouseLeftButtonDown="MasterToggle_Click">
+                                            <Image x:Name="MasterToggleImage" Source="/Images/EnableSpeaker.png" Width="20" Height="20" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+        <!--=========Modals==========-->
+        <Grid x:Name="PreferencesModalOverlay" Background="#88000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" Width="600" Padding="0" BorderBrush="#0b1220" BorderThickness="1">
+                <Grid Background="#06122b">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="45"/>
+                    </Grid.RowDefinitions>
+                    <local:ModalHeader Grid.Row="0" Title="Preferences" CloseClicked="PreferencesHeader_CloseClicked"/>
+                    <local:AudioPreferences x:Name="Preferences" Grid.Row="1"/>
+                    <StackPanel Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,5,0" Height="45">
+                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" />
+                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Margin="5,0,5,0" Click="cancel_Click"/>
+                        <Button Content="Apply" Style="{StaticResource DarkButtonStyle}" Height="26" Margin="0,0,5,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+        <Grid x:Name="StreamsModalOverlay" Background="#88000000"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#0b1220"  Width="750" Padding="0" BorderBrush="#0b1220" BorderThickness="1">
+                <Grid Background="#06122b">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <local:ModalHeader Grid.Row="0" Title="Streams" CloseClicked="StreamsHeader_CloseClicked"/>
+                    <local:Streams x:Name="StreamsControl" Grid.Row="1"/>
+                    <StackPanel Background="#0b1220" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,-10,10,0">
+                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Click="StreamsOK_Click"/>
+                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Click="StreamsCancel_Click" Height="26" Width="79" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

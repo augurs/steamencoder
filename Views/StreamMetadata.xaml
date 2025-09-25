@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="EncoderApp.Views.StreamMetadata"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EncoderApp.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="420" d:DesignWidth="400">
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#071024" Offset="0"/>
+            <GradientStop Color="#06122b" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+    <UserControl.Resources>
+        <Style x:Key="DarkButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                  Background="{TemplateBinding Background}" 
+                                  BorderBrush="{TemplateBinding BorderBrush}" 
+                                  CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980b9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1f6391"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#777"/>
+                                <Setter TargetName="border" Property="Background" Value="#333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource DarkButtonStyle}">
+            <Setter Property="Background" Value="#212a3b"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+        </Style>
+        <Style x:Key="TextBlockStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,15,0,0"/>
+        </Style>
+        <Style x:Key="TextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="0,10,0,5"/>
+            <Setter Property="Padding" Value="5,5,0,3"/>
+            <Setter Property="MinWidth" Value="210"/>
+            <Setter Property="Foreground" Value="SlateGray"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border BorderBrush="#212a3b" Grid.Row="0" CornerRadius="4" Height="230" Background="#131d2f" BorderThickness="1" Padding="10" VerticalAlignment="Top">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,15">
+                    <Image Source="/Images/stream.png" Width="25" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBlock Text="Additional Stream Metadata" Foreground="#3498db" FontSize="20" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Genre:" Style="{StaticResource TextBlockStyle}"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="genere" Style="{StaticResource TextBoxStyle}" BorderThickness="0"  Background="#0b1220">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Description:" Style="{StaticResource TextBlockStyle}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource TextBoxStyle}"  BorderThickness="0"  Background="#0b1220">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Website URL:" Style="{StaticResource TextBlockStyle}"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="http://www.mywebsite.com" BorderThickness="0"  Background="#0b1220">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Content="Private stream" Foreground="#94a3b8" Margin="0,15,0,0" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

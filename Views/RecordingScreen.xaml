@@ -1,0 +1,375 @@
+﻿<UserControl x:Class="EncoderApp.Views.RecordingScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EncoderApp.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="550">
+    <UserControl.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#071024" Offset="0"/>
+            <GradientStop Color="#06122b" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+    <UserControl.Resources>
+        <Style x:Key="DarkButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                   Background="{TemplateBinding Background}" 
+                                   BorderBrush="{TemplateBinding BorderBrush}" 
+                                   CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980b9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1f6391"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#777"/>
+                                <Setter TargetName="border" Property="Background" Value="#333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource DarkButtonStyle}">
+            <Setter Property="Background" Value="#212a3b"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+        </Style>
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border x:Name="OuterBorder"
+                                BorderThickness="1"
+                                Background="#0b1220"
+                                CornerRadius="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="38"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="PART_EditableTextBox"
+                                         Grid.Column="0"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="14"
+                                         FontFamily="pack://application:,,,/Font/#Urbanist"
+                                         Foreground="#e6eef8"
+                                         Padding="8,0,0,0"
+                                         Visibility="Hidden"/>
+                                <ContentPresenter x:Name="ContentSite"
+                                              Grid.Column="0"
+                                              Margin="8,0,0,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              Content="{Binding SelectedValue, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                              RecognizesAccessKey="True"/>
+                                <ToggleButton Grid.Column="1"
+                                          x:Name="ToggleButton"
+                                          Cursor="Hand"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press"
+                                          Background="Transparent"
+                                          BorderBrush="black"
+                                          BorderThickness="0"
+                                          OverridesDefaultStyle="True"
+                                          HorizontalAlignment="Center"
+                                          Height="37"
+                                          Width="38"
+                                          VerticalAlignment="Center">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Grid Background="{TemplateBinding Background}">
+                                                            <Path x:Name="Arrow"
+                                                              Data="M0,0 L4,4 L8,0"
+                                                              Stroke="#445370"
+                                                              StrokeThickness="1.5"
+                                                              Fill="Transparent"
+                                                              Width="8"
+                                                              Height="5"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#F0F0F0"/>
+                                                                <Setter TargetName="Arrow" Property="Stroke" Value="DarkGray"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter TargetName="Arrow" Property="Stroke" Value="#CCC"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+
+                                <Popup Name="Popup"
+                                       Placement="Bottom"
+                                       IsOpen="{TemplateBinding IsDropDownOpen}"
+                                       AllowsTransparency="True"
+                                       Focusable="False"
+                                       PopupAnimation="Slide">
+                                    <Grid MaxHeight="200"
+                                          MinWidth="{TemplateBinding ActualWidth}"
+                                          SnapsToDevicePixels="True"
+                                          Background="#445370"
+                                          Margin="0,1,0,0" Width="148" >
+                                        <Border 
+                                                BorderThickness="2"
+                                                Background="#131d2f"/>
+                                        <StackPanel IsItemsHost="True"/>
+                                    </Grid>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#445370"/>
+                                <Setter TargetName="OuterBorder" Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#445370"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem" x:Key="CleanComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                               Background="{TemplateBinding Background}"
+                               Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#15233c"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#253552"/>
+                                <Setter Property="Foreground" Value="#94a3b8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#94a3b8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="120"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderBrush="#212a3b" BorderThickness="1.5" Width="430" Background="#131d2f" CornerRadius="4"  Margin="-5,0,10,10">
+                <StackPanel Margin="10">
+                    <CheckBox Content="Record my broadcast to disk"
+                              IsChecked="True"
+                              FontSize="12"
+                              FontWeight="Bold"
+                              Foreground="#3498db"
+                              Margin="0,5,0,10"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="190"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Record to Folder:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
+                        <TextBox x:Name="MyFolderPathTextBox" Grid.Row="0" Grid.Column="1" Margin="5" Text="C:\Documents\Rocket Broadcaster\Recordings"
+                                     Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" Padding="2,6,0,0">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <Button Grid.Row="0" Grid.Column="2" Content="Browse..." Style="{StaticResource DarkButtonStyle}" Margin="5,5" Click="BrowseButton_Click"/>
+                        <TextBlock Text="Filename Template:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Padding="2,6,0,0" Text="broadcast_%Y%m%d-%H%M%S" Background="#0b1220"  BorderThickness="0" Foreground="#94a3b8">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <Button Grid.Row="1" Grid.Column="2" Width="Auto" FontSize="12" Content="Revert to Default" Style="{StaticResource DarkCancelButtonStyle}" Margin="5,5"/>
+                        <TextBlock Text="Audio Codec:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
+                        <ComboBox Grid.Row="2"  Background="Transparent"
+                             Foreground="#94a3b8" SelectedValuePath="Content" Grid.Column="1" Margin="5,5" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0">
+                            <ComboBoxItem Content="MP3 (128 kbps)"/>
+                            <ComboBoxItem Content="Ogg Vorbis (128 kbps)"/>
+                            <ComboBoxItem Content="Ogg Opus (128 kbps)"/>
+                        </ComboBox>
+                        <Button Grid.Row="2" Grid.Column="2" Content="Customize..." Style="{StaticResource DarkButtonStyle}" Margin="5,5" Click="Customize_Click"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Margin="5,0" Text="128 kbps MP3 (44100 Hz, Stereo)" Foreground="#94a3b8"/>
+                        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Vertical" Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5">
+                                <CheckBox VerticalAlignment="Center"/>
+                                <TextBlock Text="Split file every:" Foreground="#94a3b8"  VerticalAlignment="Center" Margin="5,0"/>
+                                <Grid Width="60" Height="25" Margin="5,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="20"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="MinutesTextBox"
+                                             Text="60"
+                                             HorizontalContentAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             Background="#0b1220"
+                                             Foreground="#94a3b8"
+                                             BorderThickness="0"
+                                             FontSize="12"/>
+                                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                                        <RepeatButton Content="▲" Height="12" FontSize="8" Click="IncrementMinutes_Click"/>
+                                        <RepeatButton Content="▼" Height="12" FontSize="8" Click="DecrementMinutes_Click"/>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Text="minutes" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <CheckBox/>
+                                <TextBlock Text="Sync to the top of the hour" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <!--<Border Grid.Row="1" BorderBrush="#212a3b" BorderThickness="1.5" Background="#131d2f" Width="430" CornerRadius="4" Margin="-5,0,10,25">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Automatically Remove Old Recordings" Foreground="#3498db" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <RadioButton GroupName="AutoRemove" Content="Never" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2" VerticalAlignment="Center">
+                        <RadioButton GroupName="AutoRemove" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                        <TextBlock Text="When there is less than" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0"/>
+                        <Grid Width="70" Margin="5,0,5,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                             Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" FontSize="12" Grid.Column="0"/>
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                <RepeatButton Content="▲" Foreground="#131d2f" Height="12" FontSize="8" Width="20" Click="IncreaseValue1" />
+                                <RepeatButton Content="▼" Foreground="#131d2f" Height="12" FontSize="8" Width="20" Click="DecreaseValue1"/>
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Text="%" Foreground="#94a3b8" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="free disk space" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2" VerticalAlignment="Center">
+                        <RadioButton GroupName="AutoRemove" IsChecked="True" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                        <TextBlock Text="When there are more than" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0"/>
+                        <Grid Width="70" Margin="5,0,5,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="48" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                                Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" FontSize="12" Grid.Column="0"/>
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                <RepeatButton Content="▲" Foreground="#131d2f" Click="IncreaseValue2" FontSize="8" Width="20" Height="12"/>
+                                <RepeatButton Content="▼" Foreground="#131d2f" Click="DecreaseValue2" FontSize="8" Width="20" Height="12"/>
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Text="recordings" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>-->
+
+            <!--<StackPanel Height="350" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+                <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26"/>
+                <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}"  Height="26" Margin="5,0,5,0"/>
+                <Button Content="Apply" Style="{StaticResource DarkButtonStyle}"  Height="26" Margin="0,0,5,0"/>
+            </StackPanel>-->
+
+            <!--===========Modal============-->
+            <Grid x:Name="EncoderSettingModal" Background="#88000000" Visibility="Collapsed" Panel.ZIndex="100" Margin="0,0,0,-160" Grid.RowSpan="4">
+                <Border VerticalAlignment="Center" Height="260" Width="320" Padding="15" BorderThickness="1" Margin="50,0,0,0" HorizontalAlignment="Left">
+                    <Grid  Background="#06122b">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <local:ModalHeader Grid.Row="0" Title="Encoder Settings" CloseClicked="EncoderSettings_CloseClicked" Margin="0,-15,0,15"/>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,15,0,0" Grid.RowSpan="2">
+                            <local:EncoderSettings x:Name="EncoderSettingControl"/>
+                        </ScrollViewer>
+                        <StackPanel Background="#06122b" Grid.Row="2"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,10,0">
+                            <Button Content="OK"
+                                    Style="{StaticResource DarkButtonStyle}"
+                                    Height="26" Width="79" Click="EncoderSettingOK_Click"/>
+                            <Button Content="Cancel"
+                                    Style="{StaticResource DarkCancelButtonStyle}"
+                                    Click="EncoderSettingCancel_Click"
+                                    Height="26" Width="79"
+                                    Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,266 @@
+﻿<UserControl x:Class="EncoderApp.Views.EncoderSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EncoderApp.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Width" Value="165"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border x:Name="OuterBorder"
+                                  BorderThickness="1"
+                                  Background="#0b1220"
+                                  CornerRadius="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="38"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="PART_EditableTextBox"
+                                           Grid.Column="0"
+                                           Background="Transparent"
+                                           BorderThickness="0"
+                                           VerticalContentAlignment="Center"
+                                           FontSize="14"
+                                           FontFamily="pack://application:,,,/Font/#Urbanist"
+                                           Foreground="#94a3b8"
+                                           Padding="8,0,0,0"
+                                           Visibility="Hidden"/>
+                                <ContentPresenter x:Name="ContentSite"
+                                                    Grid.Column="0"
+                                                    Margin="8,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Left"
+                                                    Content="{Binding SelectedValue, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                    RecognizesAccessKey="True"/>
+                                <ToggleButton Grid.Column="1"
+                                                x:Name="ToggleButton"
+                                                Cursor="Hand"
+                                                Focusable="False"
+                                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                ClickMode="Press"
+                                                Background="Transparent"
+                                                BorderBrush="black"
+                                                BorderThickness="0"
+                                                Foreground="#94a3b8"
+                                                OverridesDefaultStyle="True"
+                                                HorizontalAlignment="Center"
+                                                Height="37"
+                                                Width="38"
+                                                VerticalAlignment="Center">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Grid Background="{TemplateBinding Background}">
+                                                            <Path x:Name="Arrow"
+                                                                    Data="M0,0 L4,4 L8,0"
+                                                                    Stroke="#445370"
+                                                                    StrokeThickness="1.5"
+                                                                    Fill="Transparent"
+                                                                    Width="8"
+                                                                    Height="5"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#F0F0F0"/>
+                                                                <Setter Property="Foreground" Value="#94a3b8"/>
+                                                                <Setter TargetName="Arrow" Property="Stroke" Value="DarkGray"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter TargetName="Arrow" Property="Stroke" Value="#CCC"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+
+                                <Popup Name="Popup"
+                                         Placement="Bottom"
+                                         IsOpen="{TemplateBinding IsDropDownOpen}"
+                                         AllowsTransparency="True"
+                                         Focusable="False"
+                                         PopupAnimation="Slide">
+                                    <Grid MaxHeight="200"
+                                            MinWidth="{TemplateBinding ActualWidth}"
+                                            SnapsToDevicePixels="True"
+                                            Background="#445370"
+                                            Margin="0,1,0,0" Width="148" >
+                                        <Border 
+                                              BorderThickness="2"
+                                              Background="#131d2f"/>
+                                        <StackPanel IsItemsHost="True"/>
+                                    </Grid>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#445370"/>
+                                <Setter TargetName="OuterBorder" Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#445370"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem" x:Key="CleanComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                         Background="{TemplateBinding Background}"
+                         Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#15233c"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#253552"/>
+                                <Setter Property="Foreground" Value="#94a3b8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#94a3b8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DarkButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980b9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1f6391"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#777"/>
+                                <Setter TargetName="border" Property="Background" Value="#333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DarkCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource DarkButtonStyle}">
+            <Setter Property="Background" Value="#212a3b"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#071024" Offset="0"/>
+                <GradientStop Color="#06122b" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"
+                BorderBrush="#212a3b" CornerRadius="4" 
+                Background="#131d2f" BorderThickness="1" 
+                Margin="10" Height="152">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1" Margin="0,5,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Codec:" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Height="30" Background="Transparent"
+                              Foreground="#94a3b8"  SelectedValuePath="Content"
+                              Style="{StaticResource ComboBoxStyle}"
+                              ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                              SelectedIndex="0">
+                        <ComboBoxItem Content="MP3"/>
+                        <ComboBoxItem Content="Ogg Vorbis"/>
+                        <ComboBoxItem Content="Ogg Opus"/>
+                    </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Channels:" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Row="1"  Height="30" SelectedValuePath="Content" Background="Transparent"
+                              Foreground="#94a3b8" Grid.Column="1"
+                              Style="{StaticResource ComboBoxStyle}"
+                              ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                              SelectedIndex="1">
+                        <ComboBoxItem Content="1 (Mono)"/>
+                        <ComboBoxItem Content="2 (Stereo)"/>
+                    </ComboBox>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Samplerate:" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Row="2" Background="Transparent"  SelectedValuePath="Content"
+                              Foreground="#94a3b8"  Height="30" Grid.Column="1" 
+                              Style="{StaticResource ComboBoxStyle}"
+                              ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                              SelectedIndex="2">
+                        <ComboBoxItem Content="11025 Hz"/>
+                        <ComboBoxItem Content="22050 Hz"/>
+                        <ComboBoxItem Content="44100 Hz"/>
+                        <ComboBoxItem Content="48000 Hz"/>
+                        <ComboBoxItem Content="96000 Hz"/>
+                    </ComboBox>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
