@@ -212,6 +212,10 @@ namespace EncoderApp.Views
         #endregion
 
         #region MenuButtons
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
         private void Preferences_Click(object sender, RoutedEventArgs e)
         {
             PreferencesModalOverlay.Visibility = Visibility.Visible;
@@ -255,9 +259,13 @@ namespace EncoderApp.Views
                 string dbText = sliderValue <= 0
                     ? "-inf dB"
                     : $"{Math.Max(20 * Math.Log10(sliderValue / 100.0), -80):0.0} dB";
+
                 OtherAppsDbTextBlock.Text = dbText;
+
+              
             }
         }
+
         private void AudioToggle_Click(object sender, MouseButtonEventArgs e)
         {
             _isMicMuted = !_isMicMuted;
@@ -350,21 +358,29 @@ namespace EncoderApp.Views
         }
         private void OtherAppsSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            var slider = sender as Slider;
-            if (slider != null && OtherAppsDbTextBlock != null)
+            if (sender is Slider slider && OtherAppsDbTextBlock != null)
             {
                 otherAppsSliderValue = slider.Value;
 
-                string dbText = slider.Value <= 0
-                    ? "-inf dB"
-                    : $"{Math.Max(20 * Math.Log10(slider.Value / 100.0), -80):0.0} dB";
+                string dbText;
+                if (slider.Value <= 0)
+                {
+                    dbText = "-inf dB";
+                    OtherAppsToggleImage.Source = new BitmapImage(new Uri("/Images/muteSpeaker_Icon.png", UriKind.Relative));
+                }
+                else
+                {
+                    dbText = $"{Math.Max(20 * Math.Log10(slider.Value / 100.0), -80):0.0} dB";
+                    OtherAppsToggleImage.Source = new BitmapImage(new Uri("/Images/EnableSpeaker.png", UriKind.Relative));
+                }
 
                 OtherAppsDbTextBlock.Text = dbText;
 
-                float scale = (float)(slider.Value / 100.0);
-                UpdateVUMeter(OtherApplicationsVU, scale * 0.7f);
+                double scale = slider.Value / 100.0;
+                UpdateVUMeter(OtherApplicationsVU, (float)(scale * 0.7));
             }
         }
+
         private void CreateBlocks()
         {
             audioInputBlocks = new Rectangle[NumBlocks];

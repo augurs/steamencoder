@@ -259,11 +259,11 @@
                             <MenuItem Header="Project 1"/>
                         </MenuItem>
                         <Separator/>
-                        <MenuItem Header="Exit"/>
+                        <MenuItem Header="Exit" Click="Exit_Click"/>
                     </MenuItem>
                     <MenuItem Header="Broadcast">
                         <MenuItem Header="Streams" Click="Streams_Click"/>
-                        <MenuItem Header="Metadat Capture"/>
+                        <MenuItem Header="Metadata Capture"/>
                         <Separator/>
                         <MenuItem Header="Start Broadcast">
                             <MenuItem.Icon>
