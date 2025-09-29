@@ -24,6 +24,16 @@ namespace EncoderApp.Views
         {
             InitializeComponent();
         }
+        private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                comboBox.Focus();
+                comboBox.IsDropDownOpen = true;
+                e.Handled = true;
+            }
+
+        }
         private void StreamNameTxt_GotFocus(object sender, RoutedEventArgs e)
         {
             if (StreamNameTxt.Text == "My Radio Station")
@@ -50,15 +60,15 @@ namespace EncoderApp.Views
             EncoderSettingModal.Visibility = Visibility.Visible;
         }
         
-        private void MetaDataStream_CloseClicked(object sender, EventArgs e)
+        private void MetaDataStream_CloseClicked(object sender, RoutedEventArgs e)
         {
             StreamsMetaDataModal.Visibility = Visibility.Collapsed;
         } 
-        private void EncoderSettings_CloseClicked(object sender, EventArgs e)
+        private void EncoderSettings_CloseClicked(object sender, RoutedEventArgs e)
         {
             EncoderSettingModal.Visibility = Visibility.Collapsed;
         }
-        private void StreamDiagnostic_CloseClicked(object sender, EventArgs e)
+        private void StreamDiagnostic_CloseClicked(object sender, RoutedEventArgs e)
         {
             StreamDiagnosticModal.Visibility = Visibility.Collapsed;
         }

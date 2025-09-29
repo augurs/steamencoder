@@ -21,7 +21,8 @@ namespace EncoderApp.Views
     /// </summary>
     public partial class ModalHeader : UserControl
     {
-        public event EventHandler CloseClicked;
+        public event RoutedEventHandler CloseClicked;
+
         public ModalHeader()
         {
             InitializeComponent();
@@ -29,8 +30,9 @@ namespace EncoderApp.Views
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            CloseClicked?.Invoke(this, EventArgs.Empty);
+            CloseClicked?.Invoke(this, e); 
         }
+
         public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register("Title", typeof(string), typeof(ModalHeader), new PropertyMetadata(""));
 

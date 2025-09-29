@@ -25,17 +25,24 @@ namespace EncoderApp.Views
         {
             InitializeComponent();
         }
+        private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is System.Windows.Controls.ComboBox comboBox)
+            {
+                comboBox.Focus();
+                comboBox.IsDropDownOpen = true;
+                e.Handled = true;
+            }
+
+        }
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new FolderBrowserDialog())
             {
                 dialog.Description = "Select folder to save recordings";
                 dialog.ShowNewFolderButton = true;
-
-                // If user selects a folder and clicks OK
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    // Set folder path to your textbox
                     MyFolderPathTextBox.Text = dialog.SelectedPath;
                 }
             }
@@ -88,7 +95,7 @@ namespace EncoderApp.Views
         {
             EncoderSettingModal.Visibility = Visibility.Collapsed;
         }
-        private void EncoderSettings_CloseClicked(object sender, EventArgs e)
+        private void EncoderSettings_CloseClicked(object sender, RoutedEventArgs e)
         {
             EncoderSettingModal.Visibility = Visibility.Collapsed;
         }

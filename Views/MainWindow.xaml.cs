@@ -55,6 +55,7 @@ namespace EncoderApp.Views
 
             CreateBlocks();
             InitAudio();
+          
         }
 
         #region Header
@@ -151,6 +152,18 @@ namespace EncoderApp.Views
         }
         #endregion
 
+        #region About
+        private void AboutOK_Click(object sender, RoutedEventArgs e)
+        {
+            AboutModalOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private void AboutHeader_CloseClicked(object sender, RoutedEventArgs e)
+        {
+            AboutModalOverlay.Visibility = Visibility.Collapsed;
+        }
+        #endregion
+
         private async void StartClock()
         {
             while (true)
@@ -216,11 +229,11 @@ namespace EncoderApp.Views
         {
             PreferencesModalOverlay.Visibility = Visibility.Visible;
         }
-        private void ClosePreferences_Click(object sender, RoutedEventArgs e)
+        private void ClosePreferences_Click(object sender, RoutedEventArgs  e)
         {
             PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
-        private void PreferencesHeader_CloseClicked(object sender, EventArgs e)
+        private void PreferencesHeader_CloseClicked(object sender, RoutedEventArgs e)
         {
             PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
@@ -230,11 +243,14 @@ namespace EncoderApp.Views
             StreamsModalOverlay.Visibility = Visibility.Visible;
         }
 
-        private void StreamsHeader_CloseClicked(object sender, EventArgs e)
+        private void StreamsHeader_CloseClicked(object sender, RoutedEventArgs e)
         {
             StreamsModalOverlay.Visibility = Visibility.Collapsed;
         }
-
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            AboutModalOverlay.Visibility = Visibility.Visible;
+        }
         #endregion
 
         #region VolumeMixer
@@ -346,6 +362,18 @@ namespace EncoderApp.Views
 
                 float scale = (float)(slider.Value / 100.0);
                 UpdateVUMeter(AudioInputVU, scale);
+                if(AudioDbTextBlock.Text== "-inf dB")
+                {
+                    AudioToggleImage.Source = new BitmapImage(new Uri(
+                   "/Images/muteSpeaker_Icon.png",
+                    UriKind.Relative));
+                }
+                else
+                {
+                    AudioToggleImage.Source = new BitmapImage(new Uri(
+                 "/Images/EnableSpeaker.png",
+                  UriKind.Relative));
+                }
             }
         }
         private void OtherAppsSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -363,6 +391,18 @@ namespace EncoderApp.Views
 
                 float scale = (float)(slider.Value / 100.0);
                 UpdateVUMeter(OtherApplicationsVU, scale * 0.7f);
+                if (OtherAppsDbTextBlock.Text == "-inf dB")
+                {
+                    OtherAppsToggleImage.Source = new BitmapImage(new Uri(
+                   "/Images/muteSpeaker_Icon.png",
+                    UriKind.Relative));
+                }
+                else
+                {
+                    OtherAppsToggleImage.Source = new BitmapImage(new Uri(
+                 "/Images/EnableSpeaker.png",
+                  UriKind.Relative));
+                }
             }
         }
         private void CreateBlocks()

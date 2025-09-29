@@ -80,7 +80,7 @@
                                         <ContentPresenter ContentSource="Header" VerticalAlignment="Center" Margin="10,0" />
                                     </Border>
                                     <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" StaysOpen="False">
-                                        <Border Background="#0f1724" BorderBrush="Gray" BorderThickness="0">
+                                        <Border Background="#0f1724" BorderBrush="#2d343f" BorderThickness="0">
                                             <StackPanel>
                                                 <ItemsPresenter/>
                                             </StackPanel>
@@ -248,23 +248,23 @@
                 <Menu DockPanel.Dock="Top" VerticalAlignment="Center" Foreground="#94a3b8" Background="#131d2f">
                     <MenuItem Header="File" Height="20" >
                         <MenuItem Header="Broadcast Wizard" InputGestureText="Ctrl+N" />
-                        <Separator/>
+                        <Separator Background="#071024"/>
                         <MenuItem Header="New Broadcast Project" />
                         <MenuItem Header="Open Broadcast Project" InputGestureText="Ctrl+O" />
-                        <Separator/>
+                        <Separator  Background="#071024"/>
                         <MenuItem Header="Save Broadcast Project" InputGestureText="Ctrl+S"/>
                         <MenuItem Header="Save Broadcast Project As"/>
-                        <Separator/>
+                        <Separator  Background="#071024"/>
                         <MenuItem Header="Recent Broadcast Projects">
-                            <MenuItem Header="Project 1"/>
+                            <!--<MenuItem Header="Project 1"/>-->
                         </MenuItem>
-                        <Separator/>
+                        <Separator  Background="#071024"/>
                         <MenuItem Header="Exit"/>
                     </MenuItem>
                     <MenuItem Header="Broadcast">
                         <MenuItem Header="Streams" Click="Streams_Click"/>
-                        <MenuItem Header="Metadat Capture"/>
-                        <Separator/>
+                        <MenuItem Header="Metadata Capture"/>
+                        <Separator  Background="#071024"/>
                         <MenuItem Header="Start Broadcast">
                             <MenuItem.Icon>
                                 <TextBlock Text="▶" FontSize="10" Margin="0,0,5,0"/>
@@ -275,12 +275,15 @@
                                 <TextBlock Text="■" FontSize="10" Margin="0,0,5,0"/>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <Separator/>
+                        <Separator  Background="#071024"/>
                         <MenuItem Header="Split Recording Now"/>
                         <MenuItem Header="Browse Recording "/>
                     </MenuItem>
                     <MenuItem Header="Options">
                         <MenuItem Header="Preferences" Click="Preferences_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Help">
+                        <MenuItem Header="About" Click="About_Click"/>
                     </MenuItem>
                 </Menu>
             </DockPanel>
@@ -354,7 +357,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <Border Grid.Column="1" BorderBrush="#212a3b"  Background="#131d2f" BorderThickness="1" Padding="0" CornerRadius="4">
+                <Border Grid.Column="1" BorderBrush="#212a3b" Background="#131d2f" BorderThickness="1" Padding="0" CornerRadius="4">
                     <StackPanel Margin="10">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,0,0,0" Background="Transparent">
                             <Image Source="/Images/metaData.png" Width="20" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
@@ -620,5 +623,32 @@
                 </Grid>
             </Border>
         </Grid>
+        <Grid x:Name="AboutModalOverlay" Background="#88000000"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#0b1220"  Width="350" Padding="0" BorderBrush="#0b1220" BorderThickness="0">
+                <Grid Background="#06122b">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <local:ModalHeader Grid.Row="0" Title="About" CloseClicked="AboutHeader_CloseClicked"/>
+                    <local:About x:Name="AboutsControl"  Grid.Row="1"/>
+                    <StackPanel Background="#0b1220" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,-10,10,0">
+                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Click="AboutOK_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
     </Grid>
 </Window>

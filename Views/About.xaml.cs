@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,23 +17,19 @@ using System.Windows.Shapes;
 namespace EncoderApp.Views
 {
     /// <summary>
-    /// Interaction logic for EncoderSettings.xaml
+    /// Interaction logic for About.xaml
     /// </summary>
-    public partial class EncoderSettings : UserControl
+    public partial class About : UserControl
     {
-        public EncoderSettings()
+        public About()
         {
             InitializeComponent();
         }
-        private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            if (sender is ComboBox comboBox)
-            {
-                comboBox.Focus();
-                comboBox.IsDropDownOpen = true;
-                e.Handled = true;
-            }
-
+            //Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            //e.Handled = true;
         }
+
     }
 }

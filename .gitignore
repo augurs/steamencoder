@@ -1,0 +1,59 @@
+# Build output
+bin/
+obj/
+out/
+publish/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dotCover
+
+# Rider IDE
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+
+# ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Logs and temp files
+*.log
+*.vspscc
+*.vssscc
+*.tmp
+*.cache
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Microsoft Visual Studio generated files
+*.pdb
+*.mdb
+*.ilk
+*.idb
+*.exp
+*.iobj
+*.ipdb
+
+# Publish output
+publish/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node/npm if using front-end
+node_modules/
+wwwroot/lib/
+
+# Dotnet user secrets
+secrets.json

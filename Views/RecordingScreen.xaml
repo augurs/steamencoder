@@ -56,6 +56,7 @@
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="Width" Value="Auto"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ComboBox_PreviewMouseLeftButtonDown"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
