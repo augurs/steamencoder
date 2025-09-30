@@ -17,6 +17,7 @@
     <None Remove="Images\DisableSpeaker.png" />
     <None Remove="Images\EnableSpeaker.png" />
     <None Remove="Images\EncoderAppIcon.ico" />
+    <None Remove="Images\error_Icon.png" />
     <None Remove="Images\maximize.png" />
     <None Remove="Images\metaData.png" />
     <None Remove="Images\mic.png" />
@@ -58,6 +59,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\EncoderAppIcon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\error_Icon.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\maximize.png">
