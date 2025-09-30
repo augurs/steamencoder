@@ -424,36 +424,57 @@
                             <Border BorderBrush="#212a3b" BorderThickness="2" Margin="5,15,5,0" Height="315">
                                 <ScrollViewer VerticalScrollBarVisibility="Visible" >
                                     <ScrollViewer.Resources>
-                                        <!-- Global Dark ScrollBar Style -->
+
+                                        <!-- Rounded Thumb Style -->
+                                        <Style x:Key="RoundedThumbStyle" TargetType="Thumb">
+                                            <!--<Setter Property="Height" Value="40"/>-->
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border Background="#212a3b" Width="10" Margin="1,0,0,0" BorderBrush="#3b4a5a" BorderThickness="1"/>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+
+                                        <!-- ScrollBar Style -->
                                         <Style TargetType="ScrollBar">
-                                            <Setter Property="Width" Value="8"/>
-                                            <Setter Property="Background" Value="#131d2f"/>
+                                            <Setter Property="Width" Value="10"/>
+                                            <Setter Property="Background" Value="Transparent"/>
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="ScrollBar">
-                                                        <Grid Background="{TemplateBinding Background}" Width="15">
+                                                        <Grid Background="{TemplateBinding Background}" Width="{TemplateBinding Width}">
                                                             <Track x:Name="PART_Track" IsDirectionReversed="true">
+
+                                                                <!-- Decrease Button -->
                                                                 <Track.DecreaseRepeatButton>
-                                                                    <RepeatButton Command="ScrollBar.LineUpCommand" 
-                                                                                  Style="{x:Null}" 
-                                                                                  Background="Transparent" BorderBrush="#212a3b"/>
+                                                                    <RepeatButton Command="ScrollBar.LineUpCommand"
+                                                  Style="{x:Null}"
+                                                  BorderBrush="#212a3b" Background="Transparent"
+                                                  />
                                                                 </Track.DecreaseRepeatButton>
 
+                                                                <!-- Thumb -->
                                                                 <Track.Thumb>
-                                                                    <Thumb Margin="0,0,0,0" Background="#212a3b" BorderBrush="#212a3b" BorderThickness="0" />
+                                                                    <Thumb Style="{StaticResource RoundedThumbStyle}"/>
                                                                 </Track.Thumb>
 
+                                                                <!-- Increase Button -->
                                                                 <Track.IncreaseRepeatButton>
-                                                                    <RepeatButton Command="ScrollBar.LineDownCommand" 
-                                                                                  Style="{x:Null}" 
-                                                                                  Background="Transparent"  BorderBrush="#212a3b"/>
+                                                                    <RepeatButton Command="ScrollBar.LineDownCommand"
+                                                  Style="{x:Null}"
+                                                  BorderBrush="#212a3b" Background="Transparent"
+                                                />
                                                                 </Track.IncreaseRepeatButton>
+
                                                             </Track>
                                                         </Grid>
                                                     </ControlTemplate>
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
+
                                     </ScrollViewer.Resources>
                                     <ItemsControl ItemsSource="{Binding Streams}">
                                     <ItemsControl.ItemTemplate>
