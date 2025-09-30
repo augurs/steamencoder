@@ -184,6 +184,15 @@ namespace EncoderApp.Views
         {
             PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
+        private void ok_click(object sender, RoutedEventArgs e)
+        {
+            PreferencesModalOverlay.Visibility = Visibility.Collapsed;
+        } 
+        private void Apply_click(object sender, RoutedEventArgs e)
+        {
+            PreferencesModalOverlay.Visibility = Visibility.Collapsed;
+        }
+        
         #endregion
 
         #region BroadcastButtons

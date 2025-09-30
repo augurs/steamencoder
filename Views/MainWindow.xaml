@@ -646,9 +646,9 @@
                     </Grid>
                     <local:AudioPreferences x:Name="Preferences" Grid.Row="1"/>
                     <StackPanel Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,5,0" Height="45">
-                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" />
+                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Click="ok_click"/>
                         <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Margin="5,0,5,0" Click="cancel_Click"/>
-                        <Button Content="Apply" Style="{StaticResource DarkButtonStyle}" Height="26" Margin="0,0,5,0"/>
+                        <Button Content="Apply" Style="{StaticResource DarkButtonStyle}" Height="26" Margin="0,0,5,0" Click="Apply_click"/>
                     </StackPanel>
                 </Grid>
             </Border>
