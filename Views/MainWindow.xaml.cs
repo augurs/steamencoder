@@ -1,7 +1,10 @@
 ﻿using EncoderApp.Models;
+using EncoderApp.Services;
+using EncoderApp.ViewModels;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +17,7 @@ namespace EncoderApp.Views
 {
     public partial class MainWindow : Window
     {
+        private AudioDevicesScreenViewModel _audioDevicesViewModel;
         public List<StreamInfo> Streams { get; set; }
 
         private bool _isCustomMaximized = false;
@@ -33,11 +37,15 @@ namespace EncoderApp.Views
         private bool _isOtherAppsMuted = false; 
         private bool _isMasterMuted = false;
         private DateTime _lastUpdate = DateTime.MinValue;
+
+   
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
-
+     
+            _audioDevicesViewModel = (Preferences.DataContext as AudioDevicesScreenViewModel) ?? new AudioDevicesScreenViewModel();
+            _audioDevicesViewModel.PropertyChanged += AudioDevicesViewModel_PropertyChanged;
             StartClock();
 
             ArtistTextBox.TextChanged += (s, e) => MetaDataLoad();
@@ -48,23 +56,57 @@ namespace EncoderApp.Views
             Streams = new List<StreamInfo>
             {
                 new StreamInfo { Name = "Main Stream",   Mount = "Mount:/live",   IsConnected = true },
-                new StreamInfo { Name = "Backup Stream", Mount = "Mount:/backup", IsConnected = false },
+                new StreamInfo { Name = "Backup Stream", Mount = "Mount:/backup", IsConnected = false},
                 new StreamInfo { Name = "Music Stream",  Mount = "Mount:/music",  IsConnected = true },
-                new StreamInfo { Name = "News Stream",   Mount = "Mount:/news",   IsConnected = false }
+                new StreamInfo { Name = "News Stream",   Mount = "Mount:/news",   IsConnected = false , IsError=true } ,
+                 new StreamInfo { Name = "Sports Stream",   Mount = "Mount:/sports",   IsConnected = true },
+                  new StreamInfo { Name = "Talk Stream",   Mount = "Mount:/talk",   IsConnected = false },
+                   new StreamInfo { Name = "Weather Stream",   Mount = "Mount:/weather",   IsConnected = true },
+                    new StreamInfo { Name = "Event Stream",   Mount = "Mount:/event",   IsConnected = false , IsError=true },
+
             };
 
             CreateBlocks();
             InitAudio();
-          
-        }
+            AudioCaptureService.Instance.OnVolumeChanged += (level) =>
+            {
+                float normalizedLevel = Math.Clamp(level / 100f, 0f, 1f);
+                Dispatcher.Invoke(() =>
+                {
+                    if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
+                    {
+                        UpdateVUMeter(OtherApplicationsVU, normalizedLevel * (float)(otherAppsSliderValue / 100.0));
+                        if (!_isMasterMuted)
+                            UpdateVUMeter(MasterVU, normalizedLevel * (float)(otherAppsSliderValue / 100.0));
+                    }
+                });
+            };
 
+        }
+        private void AudioDevicesViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AudioDevicesScreenViewModel.EnableSystemAudioCapture))
+            {
+                if (_audioDevicesViewModel.EnableSystemAudioCapture && !_isOtherAppsMuted)
+                {
+                    AudioCaptureService.Instance.Start();
+                }
+                else
+                {
+                    AudioCaptureService.Instance.Stop();
+                    UpdateVUMeter(OtherApplicationsVU, 0); // Clear VU meter
+                    if (!_isMasterMuted)
+                        UpdateVUMeter(MasterVU, 0);
+                }
+            }
+        }
         #region Header
         private void Header_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 this.DragMove();
         }
-
+      
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
@@ -101,11 +143,22 @@ namespace EncoderApp.Views
         #region Streams
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+           
             if (sender is Border border && border.DataContext is StreamInfo stream)
             {
                 bool isConnected = stream.IsConnected;
+                streamONText.Text = stream.Name;
                 OnAirPanel.Visibility = isConnected ? Visibility.Visible : Visibility.Collapsed;
+          
+                streamOFFText.Text = stream.Name;
                 OffAirPanel.Visibility = isConnected ? Visibility.Collapsed : Visibility.Visible;
+                Errorpanel.Visibility = Visibility.Collapsed;
+                if (stream.IsError == true)
+                {
+                    OnAirPanel.Visibility = Visibility.Collapsed;
+                    OffAirPanel.Visibility = Visibility.Collapsed;
+                    Errorpanel.Visibility = Visibility.Visible;
+                }
             }
         }
         private void StreamsCancel_Click(object sender, RoutedEventArgs e)
@@ -162,6 +215,100 @@ namespace EncoderApp.Views
         {
             AboutModalOverlay.Visibility = Visibility.Collapsed;
         }
+        #endregion
+
+        #region ModalHeaders
+        private Point _startPoint;
+        private bool _isDragging = false;
+
+        private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition(null);
+            _isDragging = true;
+            (sender as UIElement).CaptureMouse();
+        }
+
+        private void Header_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isDragging)
+            {
+                Point currentPoint = e.GetPosition(null);
+                double offsetX = currentPoint.X - _startPoint.X;
+                double offsetY = currentPoint.Y - _startPoint.Y;
+
+                OverlayTransform.X += offsetX;
+                OverlayTransform.Y += offsetY;
+
+                _startPoint = currentPoint;
+            }
+        }
+
+        private void Header_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isDragging = false;
+            (sender as UIElement).ReleaseMouseCapture();
+        }
+        private Point _streamsStartPoint;
+        private bool _isStreamsDragging = false;
+
+        private Point _aboutStartPoint;
+        private bool _isAboutDragging = false;
+
+        private void StreamsHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _streamsStartPoint = e.GetPosition(null);
+            _isStreamsDragging = true;
+            (sender as UIElement).CaptureMouse();
+        }
+
+        private void StreamsHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isStreamsDragging)
+            {
+                Point currentPoint = e.GetPosition(null);
+                double offsetX = currentPoint.X - _streamsStartPoint.X;
+                double offsetY = currentPoint.Y - _streamsStartPoint.Y;
+
+                StreamsOverlayTransform.X += offsetX;
+                StreamsOverlayTransform.Y += offsetY;
+
+                _streamsStartPoint = currentPoint;
+            }
+        }
+
+        private void StreamsHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isStreamsDragging = false;
+            (sender as UIElement).ReleaseMouseCapture();
+        }
+        private void AboutHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _aboutStartPoint = e.GetPosition(null);
+            _isAboutDragging = true;
+            (sender as UIElement).CaptureMouse();
+        }
+
+        private void AboutHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isAboutDragging)
+            {
+                Point currentPoint = e.GetPosition(null);
+                double offsetX = currentPoint.X - _aboutStartPoint.X;
+                double offsetY = currentPoint.Y - _aboutStartPoint.Y;
+
+                AboutOverlayTransform.X += offsetX;
+                AboutOverlayTransform.Y += offsetY;
+
+                _aboutStartPoint = currentPoint;
+            }
+        }
+
+        private void AboutHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isAboutDragging = false;
+            (sender as UIElement).ReleaseMouseCapture();
+        }
+
         #endregion
 
         private async void StartClock()
@@ -306,13 +453,22 @@ namespace EncoderApp.Views
             {
                 MessageBox.Show($"Failed to load speaker icon: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             if (_isOtherAppsMuted)
             {
-                OtherAppsSlider.Value = 0; 
+                OtherAppsSlider.Value = 0;
+                AudioCaptureService.Instance.Stop();
+                UpdateVUMeter(OtherApplicationsVU, 0);
+                if (!_isMasterMuted)
+                    UpdateVUMeter(MasterVU, 0);
             }
             else
             {
-                OtherAppsSlider.Value = 50; 
+                OtherAppsSlider.Value = 50;
+                if (_audioDevicesViewModel.EnableSystemAudioCapture)
+                {
+                    AudioCaptureService.Instance.Start();
+                }
             }
         }
         private void MasterToggle_Click(object sender, MouseButtonEventArgs e)
@@ -334,17 +490,23 @@ namespace EncoderApp.Views
             {
                 AudioSlider.Value = 0;
                 AudioSlider.IsEnabled = false;
-
                 OtherAppsSlider.Value = 0;
                 OtherAppsSlider.IsEnabled = false;
-             
+                AudioCaptureService.Instance.Stop();
+                UpdateVUMeter(AudioInputVU, 0);
+                UpdateVUMeter(OtherApplicationsVU, 0);
+                UpdateVUMeter(MasterVU, 0);
             }
             else
             {
                 AudioSlider.Value = 50;
-                AudioSlider.IsEnabled=true;
+                AudioSlider.IsEnabled = true;
                 OtherAppsSlider.Value = 50;
                 OtherAppsSlider.IsEnabled = true;
+                if (!_isMicMuted)
+                    InitAudio();
+                if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
+                    AudioCaptureService.Instance.Start();
             }
         }
         private void AudioSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -362,17 +524,17 @@ namespace EncoderApp.Views
 
                 float scale = (float)(slider.Value / 100.0);
                 UpdateVUMeter(AudioInputVU, scale);
-                if(AudioDbTextBlock.Text== "-inf dB")
+                if (AudioDbTextBlock.Text == "-inf dB")
                 {
                     AudioToggleImage.Source = new BitmapImage(new Uri(
-                   "/Images/muteSpeaker_Icon.png",
-                    UriKind.Relative));
+                        "/Images/muteSpeaker_Icon.png",
+                        UriKind.Relative));
                 }
                 else
                 {
                     AudioToggleImage.Source = new BitmapImage(new Uri(
-                 "/Images/EnableSpeaker.png",
-                  UriKind.Relative));
+                        "/Images/EnableSpeaker.png",
+                        UriKind.Relative));
                 }
             }
         }
@@ -390,18 +552,21 @@ namespace EncoderApp.Views
                 OtherAppsDbTextBlock.Text = dbText;
 
                 float scale = (float)(slider.Value / 100.0);
-                UpdateVUMeter(OtherApplicationsVU, scale * 0.7f);
+                if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
+                {
+                    UpdateVUMeter(OtherApplicationsVU, scale * 0.7f);
+                }
                 if (OtherAppsDbTextBlock.Text == "-inf dB")
                 {
                     OtherAppsToggleImage.Source = new BitmapImage(new Uri(
-                   "/Images/muteSpeaker_Icon.png",
-                    UriKind.Relative));
+                        "/Images/muteSpeaker_Icon.png",
+                        UriKind.Relative));
                 }
                 else
                 {
                     OtherAppsToggleImage.Source = new BitmapImage(new Uri(
-                 "/Images/EnableSpeaker.png",
-                  UriKind.Relative));
+                        "/Images/EnableSpeaker.png",
+                        UriKind.Relative));
                 }
             }
         }
@@ -506,12 +671,9 @@ namespace EncoderApp.Views
                     micCapture.StartRecording();
                 }
 
-                if (!_isOtherAppsMuted)
+                if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
                 {
-                    appCapture = new WasapiLoopbackCapture();
-                    appCapture.WaveFormat = new WaveFormat(44100, 2);
-                    appCapture.DataAvailable += App_DataAvailable;
-                    appCapture.StartRecording();
+                    AudioCaptureService.Instance.Start();
                 }
             }
             catch (Exception ex)
@@ -547,7 +709,7 @@ namespace EncoderApp.Views
         }
         private void App_DataAvailable(object sender, WaveInEventArgs e)
         {
-            if (_isOtherAppsMuted) return;
+            if (_isOtherAppsMuted || !_audioDevicesViewModel.EnableSystemAudioCapture) return;
 
             if ((DateTime.Now - _lastUpdate).TotalMilliseconds < 50)
                 return;
@@ -571,14 +733,12 @@ namespace EncoderApp.Views
 
             _lastUpdate = DateTime.Now;
         }
-
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             micCapture?.StopRecording();
             micCapture?.Dispose();
-            appCapture?.StopRecording();
-            appCapture?.Dispose();
+            AudioCaptureService.Instance.Stop();
         }
         #endregion
     }

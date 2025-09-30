@@ -4,62 +4,65 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" Height="30">
-    <DockPanel Height="30">
-        <DockPanel.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#071024" Offset="0"/>
-                <GradientStop Color="#06122b" Offset="1"/>
-            </LinearGradientBrush>
-        </DockPanel.Background>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10,0,0,0">
-            <Image Source="/Images/EncoderAppIcon.ico" Width="17" Height="18" Margin="0,0,5,0"/>
-            <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+    <!--<Border x:Name="Header" Height="auto" MouseDown="Header_MouseDown" VerticalAlignment="Top">-->
+        <DockPanel Height="30">
+            <DockPanel.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#071024" Offset="0"/>
+                    <GradientStop Color="#06122b" Offset="1"/>
+                </LinearGradientBrush>
+            </DockPanel.Background>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10,0,0,0">
+                <Image Source="/Images/EncoderAppIcon.ico" Width="17" Height="18" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                        FontSize="14" Foreground="#94a3b8" VerticalAlignment="Center" FontWeight="Bold"/>
-        </StackPanel>
-        <Button Width="30" Height="28" HorizontalAlignment="Right" Click="CloseButton_Click">
-            <Button.Template>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                </ControlTemplate>
-            </Button.Template>
+            </StackPanel>
+            <Button Width="30" Height="28" HorizontalAlignment="Right" Click="CloseButton_Click">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
 
-            <Button.Style>
-                <Style TargetType="Button">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="BorderBrush" Value="Transparent"/>
-                    <Setter Property="Content">
-                        <Setter.Value>
-                            <!-- Default icon -->
-                            <Image Source="/Images/close.png" Width="12" Height="12"/>
-                        </Setter.Value>
-                    </Setter>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <!-- Default icon -->
+                                <Image Source="/Images/close.png" Width="12" Height="12"/>
+                            </Setter.Value>
+                        </Setter>
 
-                    <Style.Triggers>
-                        <!-- Hover -->
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="Red"/>
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <Image Source="/Images/close_white.png" Width="12" Height="12"/>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
+                        <Style.Triggers>
+                            <!-- Hover -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <Image Source="/Images/close_white.png" Width="12" Height="12"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
 
-                        <!-- Pressed -->
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="Red"/>
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <Image Source="/Images/close_white.png" Width="12" Height="12"/>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
+                            <!-- Pressed -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <Image Source="/Images/close_white.png" Width="12" Height="12"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
 
-    </DockPanel>
+        </DockPanel>
+    <!--</Border>-->
 </UserControl>

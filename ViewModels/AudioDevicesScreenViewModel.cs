@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EncoderApp.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -128,9 +129,28 @@ namespace EncoderApp.ViewModels
             }
         }
         #endregion
+        #region OtherApplication
+        private bool _enableSystemAudioCapture = true;
+        public bool EnableSystemAudioCapture
+        {
+            get => _enableSystemAudioCapture;
+            set
+            {
+                if (_enableSystemAudioCapture != value)
+                {
+                    _enableSystemAudioCapture = value;
+                    OnPropertyChanged();
+                    // Update audio capture state if needed
+                    UpdateSystemAudioCapture();
+                }
+            }
+        }
+
+        #endregion
         public AudioDevicesScreenViewModel()
         {
             UpdateSampleRates();
+            AudioInputCapture();
         }
 
         private void UpdateLatencyEnabled()
@@ -164,7 +184,7 @@ namespace EncoderApp.ViewModels
         }
         private void checksShowMonoInputs()
         {
-            if (ShowMonoInputs==true)
+            if (ShowMonoInputs == true)
             {
                 EnableInputAudio = false;
                 SelectedAudioApi = "Windows WDM-KS";
@@ -175,6 +195,26 @@ namespace EncoderApp.ViewModels
                 SelectedAudioApi = "Windows WASAPI";
             }
             UpdateSampleRates();
+        }
+        private void UpdateSystemAudioCapture()
+        {
+            if (EnableSystemAudioCapture)
+            {
+                AudioCaptureService.Instance.Start(selectedDeviceIndex); // Start system audio capture
+            }
+            else
+            {
+                AudioCaptureService.Instance.Stop(); // Stop system audio capture
+            }
+        }
+        int selectedDeviceIndex = 0;
+        private void AudioInputCapture()
+        {
+            if (EnableInputAudio==true)
+            {
+                AudioCaptureService.Instance.Start(selectedDeviceIndex);
+            }
+          
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null) =>

@@ -10,6 +10,7 @@ namespace EncoderApp.Models
     {
         public string Name { get; set; }       
         public string Mount { get; set; }        
-        public bool IsConnected { get; set; }  
+        public bool IsConnected { get; set; }
+        public bool? IsError { get; set; } = false;
     }
 }

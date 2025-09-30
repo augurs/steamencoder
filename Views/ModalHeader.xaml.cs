@@ -28,6 +28,18 @@ namespace EncoderApp.Views
             InitializeComponent();
 
         }
+        //private void Header_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (e.LeftButton == MouseButtonState.Pressed)
+        //    {
+        //        Window parentWindow = Window.GetWindow(this);
+        //        if (parentWindow != null)
+        //        {
+        //            parentWindow.DragMove();
+        //        }
+        //    }
+        //}
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             CloseClicked?.Invoke(this, e); 

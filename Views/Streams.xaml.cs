@@ -114,5 +114,24 @@ namespace EncoderApp.Views
         {
             StreamDiagnosticModal.Visibility = Visibility.Collapsed;
         }
+
+        private void IncrementPort_Click(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(portTextBox.Text, out int port))
+            {
+                port++; 
+                portTextBox.Text = port.ToString();
+            }
+        }
+
+        private void DecrementPort_Click(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(portTextBox.Text, out int port))
+            {
+                port--; 
+                portTextBox.Text = port.ToString();
+            }
+        }
+
     }
 }
