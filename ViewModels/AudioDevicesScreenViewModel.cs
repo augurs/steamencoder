@@ -1,4 +1,5 @@
-﻿using EncoderApp.Services;
+﻿using EncoderApp.Models;
+using EncoderApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +28,10 @@ namespace EncoderApp.ViewModels
                 if (_selectedInputSampleRate != value)
                 {
                     _selectedInputSampleRate = value;
+
                     OnPropertyChanged();
+                    AppConfigurationManager.WriteValue("SelectedInputSampleRate", _selectedInputSampleRate);
+
                 }
             }
         }
@@ -41,6 +45,7 @@ namespace EncoderApp.ViewModels
                 {
                     _enableAudio = value;
                     OnPropertyChanged();
+                  
                 }
             }
         }
@@ -54,6 +59,7 @@ namespace EncoderApp.ViewModels
                     _selectedAudioApi = value;
                     OnPropertyChanged();
                     UpdateLatencyEnabled();
+                    AppConfigurationManager.WriteValue("SelectedAudioApi", _selectedAudioApi);
                 }
             }
         }
@@ -66,6 +72,7 @@ namespace EncoderApp.ViewModels
                 {
                     _latencyEnabled = value;
                     OnPropertyChanged();
+                    AppConfigurationManager.WriteValue("LatencyEnabled", _latencyEnabled.ToString());
                 }
             }
         }
@@ -101,7 +108,7 @@ namespace EncoderApp.ViewModels
             }
         }
 
-        private bool _enableInputAudio = false;
+        private bool _enableInputAudio = true;
         public bool EnableInputAudio
         {
             get => _enableInputAudio;
@@ -111,6 +118,7 @@ namespace EncoderApp.ViewModels
                 {
                     _enableInputAudio = value;
                     OnPropertyChanged();
+                    AudioInputCapture();
                 }
             }
         }
@@ -147,16 +155,46 @@ namespace EncoderApp.ViewModels
         }
 
         #endregion
+        private bool _isRestoringSettings = false;
+
         public AudioDevicesScreenViewModel()
         {
+            _isRestoringSettings = true;
+            string savedApi = AppConfigurationManager.ReadValue("SelectedAudioApi");
+            if (!string.IsNullOrEmpty(savedApi))
+                _selectedAudioApi = savedApi;
+
+            string savedInputRate = AppConfigurationManager.ReadValue("SelectedInputSampleRate");
+            if (!string.IsNullOrEmpty(savedInputRate))
+                _selectedInputSampleRate = savedInputRate;
+
+            string savedLatency = AppConfigurationManager.ReadValue("LatencyEnabled");
+            if (!string.IsNullOrEmpty(savedLatency) && bool.TryParse(savedLatency, out bool latency))
+                _latencyEnabled = latency;
+
             UpdateSampleRates();
+
+            if (InputSampleRates.Contains(_selectedInputSampleRate))
+                SelectedInputSampleRate = _selectedInputSampleRate;
+            else
+                SelectedInputSampleRate = InputSampleRates[0];
+
+            if (!string.IsNullOrEmpty(_selectedAudioApi))
+                SelectedAudioApi = _selectedAudioApi;
+
+            _isRestoringSettings = false;
+
             AudioInputCapture();
         }
 
         private void UpdateLatencyEnabled()
         {
-            LatencyEnabled = SelectedAudioApi == "ASIO"|| SelectedAudioApi == "Windows WASAPI";
+            if (_isRestoringSettings)
+                return;
+
+            LatencyEnabled = SelectedAudioApi == "ASIO" || SelectedAudioApi == "Windows WASAPI";
         }
+
         private void UpdateSampleRates()
         {
             InputSampleRates.Clear();
@@ -176,12 +214,15 @@ namespace EncoderApp.ViewModels
                 OutputSampleRates.Add("48000");
                 OutputSampleRates.Add("96000");
             }
-            if (InputSampleRates.Count > 0)
+
+            // Only set SelectedInputSampleRate if it's null or invalid
+            if (string.IsNullOrEmpty(SelectedInputSampleRate) || !InputSampleRates.Contains(SelectedInputSampleRate))
                 SelectedInputSampleRate = InputSampleRates[0];
 
-            if (OutputSampleRates.Count > 0)
+            if (string.IsNullOrEmpty(SelectedOutputSampleRate) || !OutputSampleRates.Contains(SelectedOutputSampleRate))
                 SelectedOutputSampleRate = OutputSampleRates[0];
         }
+
         private void checksShowMonoInputs()
         {
             if (ShowMonoInputs == true)
@@ -200,21 +241,28 @@ namespace EncoderApp.ViewModels
         {
             if (EnableSystemAudioCapture)
             {
-                AudioCaptureService.Instance.Start(selectedDeviceIndex); // Start system audio capture
+                OtherAppAudioCaptureService.Instance.Start(selectedDeviceIndex); 
             }
             else
             {
-                AudioCaptureService.Instance.Stop(); // Stop system audio capture
+                OtherAppAudioCaptureService.Instance.Stop();
             }
         }
         int selectedDeviceIndex = 0;
+       
         private void AudioInputCapture()
         {
-            if (EnableInputAudio==true)
+            if (EnableInputAudio)
             {
-                AudioCaptureService.Instance.Start(selectedDeviceIndex);
+               AppConfigurationManager.WriteValue("AudioInput", "Yes");
+               AudioInputCaptureService.Instance.Start(selectedDeviceIndex);
+            }  
+            else
+            {
+                AppConfigurationManager.WriteValue("AudioInput", "No");
+                AudioInputCaptureService.Instance.Stop();
             }
-          
+
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null) =>

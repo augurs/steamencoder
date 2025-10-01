@@ -4,6 +4,7 @@ using EncoderApp.ViewModels;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,7 +19,8 @@ namespace EncoderApp.Views
     public partial class MainWindow : Window
     {
         private AudioDevicesScreenViewModel _audioDevicesViewModel;
-        public List<StreamInfo> Streams { get; set; }
+        public ObservableCollection<StreamInfo> Streams { get; set; } = new ObservableCollection<StreamInfo>();
+        //public List<StreamInfo> Streams { get; set; }
 
         private bool _isCustomMaximized = false;
         private Rect _restoreBounds;
@@ -38,7 +40,6 @@ namespace EncoderApp.Views
         private bool _isMasterMuted = false;
         private DateTime _lastUpdate = DateTime.MinValue;
 
-   
         public MainWindow()
         {
             InitializeComponent();
@@ -53,22 +54,11 @@ namespace EncoderApp.Views
             MetaDataLoad();
             UpdateAudioDbText(audioInputSliderValue);
             UpdateOtherAppsDbText(otherAppsSliderValue);
-            Streams = new List<StreamInfo>
-            {
-                new StreamInfo { Name = "Main Stream",   Mount = "Mount:/live",   IsConnected = true },
-                new StreamInfo { Name = "Backup Stream", Mount = "Mount:/backup", IsConnected = false},
-                new StreamInfo { Name = "Music Stream",  Mount = "Mount:/music",  IsConnected = true },
-                new StreamInfo { Name = "News Stream",   Mount = "Mount:/news",   IsConnected = false , IsError=true } ,
-                 new StreamInfo { Name = "Sports Stream",   Mount = "Mount:/sports",   IsConnected = true },
-                  new StreamInfo { Name = "Talk Stream",   Mount = "Mount:/talk",   IsConnected = false },
-                   new StreamInfo { Name = "Weather Stream",   Mount = "Mount:/weather",   IsConnected = true },
-                    new StreamInfo { Name = "Event Stream",   Mount = "Mount:/event",   IsConnected = false , IsError=true },
-
-            };
-
+            Streams.Clear();
+            AppConfigurationManager.LoadStreamsIntoCollection(Streams);
             CreateBlocks();
             InitAudio();
-            AudioCaptureService.Instance.OnVolumeChanged += (level) =>
+            OtherAppAudioCaptureService.Instance.OnVolumeChanged += (level) =>
             {
                 float normalizedLevel = Math.Clamp(level / 100f, 0f, 1f);
                 Dispatcher.Invoke(() =>
@@ -89,12 +79,33 @@ namespace EncoderApp.Views
             {
                 if (_audioDevicesViewModel.EnableSystemAudioCapture && !_isOtherAppsMuted)
                 {
-                    AudioCaptureService.Instance.Start();
+                    OtherAppAudioCaptureService.Instance.Start();
                 }
                 else
                 {
-                    AudioCaptureService.Instance.Stop();
-                    UpdateVUMeter(OtherApplicationsVU, 0); // Clear VU meter
+                    OtherAppAudioCaptureService.Instance.Stop();
+                    UpdateVUMeter(OtherApplicationsVU, 0);
+                    if (!_isMasterMuted)
+                        UpdateVUMeter(MasterVU, 0);
+                }
+            }
+            else if (e.PropertyName == nameof(AudioDevicesScreenViewModel.EnableInputAudio))
+            {
+                if (_audioDevicesViewModel.EnableInputAudio)
+                {
+                    try
+                    {
+                        AudioInputCaptureService.Instance.Start();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error starting AudioInputCaptureService: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    AudioInputCaptureService.Instance.Stop();
+                    UpdateVUMeter(AudioInputVU, 0);
                     if (!_isMasterMuted)
                         UpdateVUMeter(MasterVU, 0);
                 }
@@ -438,6 +449,7 @@ namespace EncoderApp.Views
                 UriKind.Relative));
             if (_isMicMuted)
             {
+                AudioInputCaptureService.Instance.Stop();
                 _previousAudioInputSliderValue = AudioSlider.Value;
                 AudioSlider.Value = 0;
                 captures?.StopRecording();
@@ -445,6 +457,10 @@ namespace EncoderApp.Views
             else
             {
                 AudioSlider.Value = _previousAudioInputSliderValue;
+                if (_audioDevicesViewModel.EnableInputAudio)
+                {
+                    AudioInputCaptureService.Instance.Start();
+                }
                 InitAudio();
             }
         }
@@ -466,7 +482,7 @@ namespace EncoderApp.Views
             if (_isOtherAppsMuted)
             {
                 OtherAppsSlider.Value = 0;
-                AudioCaptureService.Instance.Stop();
+                OtherAppAudioCaptureService.Instance.Stop();
                 UpdateVUMeter(OtherApplicationsVU, 0);
                 if (!_isMasterMuted)
                     UpdateVUMeter(MasterVU, 0);
@@ -476,7 +492,7 @@ namespace EncoderApp.Views
                 OtherAppsSlider.Value = 50;
                 if (_audioDevicesViewModel.EnableSystemAudioCapture)
                 {
-                    AudioCaptureService.Instance.Start();
+                    OtherAppAudioCaptureService.Instance.Start();
                 }
             }
         }
@@ -501,7 +517,8 @@ namespace EncoderApp.Views
                 AudioSlider.IsEnabled = false;
                 OtherAppsSlider.Value = 0;
                 OtherAppsSlider.IsEnabled = false;
-                AudioCaptureService.Instance.Stop();
+                OtherAppAudioCaptureService.Instance.Stop();
+                AudioInputCaptureService.Instance.Stop();
                 UpdateVUMeter(AudioInputVU, 0);
                 UpdateVUMeter(OtherApplicationsVU, 0);
                 UpdateVUMeter(MasterVU, 0);
@@ -515,7 +532,11 @@ namespace EncoderApp.Views
                 if (!_isMicMuted)
                     InitAudio();
                 if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
-                    AudioCaptureService.Instance.Start();
+                    OtherAppAudioCaptureService.Instance.Start();
+                if(!_isMicMuted && _audioDevicesViewModel.EnableInputAudio)
+                {
+                    AudioInputCaptureService.Instance.Start();
+                }
             }
         }
         private void AudioSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -567,15 +588,11 @@ namespace EncoderApp.Views
                 }
                 if (OtherAppsDbTextBlock.Text == "-inf dB")
                 {
-                    OtherAppsToggleImage.Source = new BitmapImage(new Uri(
-                        "/Images/muteSpeaker_Icon.png",
-                        UriKind.Relative));
+                    OtherAppsToggleImage.Source = new BitmapImage(new Uri("/Images/muteSpeaker_Icon.png", UriKind.Relative));
                 }
                 else
                 {
-                    OtherAppsToggleImage.Source = new BitmapImage(new Uri(
-                        "/Images/EnableSpeaker.png",
-                        UriKind.Relative));
+                    OtherAppsToggleImage.Source = new BitmapImage(new Uri("/Images/EnableSpeaker.png", UriKind.Relative));
                 }
             }
         }
@@ -670,7 +687,7 @@ namespace EncoderApp.Views
         {
             try
             {
-                if (!_isMicMuted)
+                if (!_isMicMuted && _audioDevicesViewModel.EnableInputAudio)
                 {
                     micCapture = new WaveInEvent
                     {
@@ -678,11 +695,12 @@ namespace EncoderApp.Views
                     };
                     micCapture.DataAvailable += Mic_DataAvailable;
                     micCapture.StartRecording();
+                    AudioInputCaptureService.Instance.Start();
                 }
 
                 if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
                 {
-                    AudioCaptureService.Instance.Start();
+                    OtherAppAudioCaptureService.Instance.Start();
                 }
             }
             catch (Exception ex)
@@ -693,8 +711,11 @@ namespace EncoderApp.Views
 
         private void Mic_DataAvailable(object sender, WaveInEventArgs e)
         {
-            if (_isMicMuted) return;
+            var audioInputOkay = AppConfigurationManager.ReadValue("AudioInput");
 
+            if (_isMicMuted || audioInputOkay != "Yes") return;
+           
+          
             if ((DateTime.Now - _lastUpdate).TotalMilliseconds < 50)
                 return;
 
@@ -744,11 +765,26 @@ namespace EncoderApp.Views
         }
         protected override void OnClosed(EventArgs e)
         {
+            _audioDevicesViewModel.PropertyChanged -= AudioDevicesViewModel_PropertyChanged;
+            try { OtherAppAudioCaptureService.Instance.Stop(); }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Error stopping other app audio: {ex.Message}"); }
+
+            try { AudioInputCaptureService.Instance.Stop(); }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Error stopping input audio: {ex.Message}"); }
+            try
+            {
+                micCapture?.StopRecording();
+                micCapture?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error disposing mic capture: {ex.Message}");
+            }
+
             base.OnClosed(e);
-            micCapture?.StopRecording();
-            micCapture?.Dispose();
-            AudioCaptureService.Instance.Stop();
+            GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

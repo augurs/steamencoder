@@ -331,7 +331,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,0,0,0" Background="Transparent">
                         <TextBlock Text="Audio Input" Foreground="#3498db" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <CheckBox x:Name="EnableInputCheck" Content="Enable Audio Input Device" IsChecked="{Binding EnableInputAudio, Mode=TwoWay}"  Margin="0,15,0,10" Foreground="#94a3b8"/>
+                    <CheckBox x:Name="EnableInputCheck" Content="Enable Audio Input Device" IsChecked="{Binding EnableInputAudio, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="0,15,0,10" Foreground="#94a3b8"/>
                     <Grid IsEnabled="{Binding IsChecked, ElementName=EnableInputCheck}" Margin="0,5,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
@@ -415,6 +415,8 @@
                                   SelectedValuePath="Content"
                                   SelectedIndex="0">
                             <ComboBoxItem Content="System Default"/>
+                            <!--<ComboBoxItem Content="System Default-Headphones(High Definition Audio Device)"/>
+                            <ComboBoxItem Content="Headphones(High Definition Audio Device)"/>-->
                         </ComboBox>
                     </Grid>
                 </StackPanel>
