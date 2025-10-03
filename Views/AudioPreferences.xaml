@@ -6,9 +6,9 @@
              xmlns:local="clr-namespace:EncoderApp"
              mc:Ignorable="d"
              Height="555"
-             Width="620"
+             Width="720"
              MinHeight="540"
-             MinWidth="620">
+             MinWidth="720">
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#071024" Offset="0"/>

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EncoderApp.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="550" d:DesignWidth="550">
+             d:DesignHeight="550" d:DesignWidth="680">
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#071024" Offset="0"/>
@@ -203,14 +203,14 @@
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid>
+        <Grid Margin="-40,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="120"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" BorderBrush="#212a3b" BorderThickness="1.5" Width="430" Background="#131d2f" CornerRadius="4"  Margin="-5,0,10,10">
+            <Border Grid.Row="0" BorderBrush="#212a3b"  BorderThickness="1.5" Width="510" Background="#131d2f" CornerRadius="4" >
                 <StackPanel Margin="10">
                     <CheckBox Content="Record my broadcast to disk"
                               IsChecked="True"
@@ -228,7 +228,7 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="110"/>
-                            <ColumnDefinition Width="190"/>
+                            <ColumnDefinition Width="260"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Record to Folder:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>

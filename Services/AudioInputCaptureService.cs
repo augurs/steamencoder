@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using EncoderApp.Views;
+using NAudio.Wave;
 using System;
 using System.Windows;
 
@@ -24,16 +25,16 @@ namespace EncoderApp.Services
         public void Start(int deviceIndex = 0)
         {
             Stop();
+
             if (deviceIndex < 0 || deviceIndex >= WaveInEvent.DeviceCount)
             {
-                MessageBox.Show(
+                CustomMessageBox.ShowInfo(
                     $"Invalid input device index: {deviceIndex}. Available devices: {WaveInEvent.DeviceCount}. Please select a valid microphone.",
-                    "Microphone Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning
+                    "Warning"
                 );
                 return;
             }
+
             _waveIn = new WaveInEvent
             {
                 DeviceNumber = deviceIndex,
@@ -50,13 +51,13 @@ namespace EncoderApp.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                CustomMessageBox.ShowInfo(
                     $"Failed to start microphone recording:\n{ex.Message}",
-                    "Microphone Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
+                    "Error"
                 );
             }
+
+
         }
 
 
@@ -101,7 +102,11 @@ namespace EncoderApp.Services
         {
             if (e.Exception != null)
             {
-                MessageBox.Show("Error capturing audio: " + e.Exception.Message);
+                CustomMessageBox.ShowInfo(
+     "Error capturing audio: " + e.Exception.Message,
+     "Error"
+ );
+
             }
             Stop();
         }

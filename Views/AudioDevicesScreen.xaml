@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="750" >
+             d:DesignHeight="500" d:DesignWidth="680" >
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#071024" Offset="0"/>
@@ -36,7 +36,7 @@
             <Setter Property="Height" Value="40"/>
             <Setter Property="Foreground" Value="#94a3b8"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Width" Value="215"/>
+            <Setter Property="Width" Value="285"/>
             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ComboBox_PreviewMouseLeftButtonDown"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -222,7 +222,7 @@
         </Style>
     </UserControl.Resources>
     <ScrollViewer >
-        <Grid Margin="10">
+        <Grid Margin="-22,10,0,0" Width="520" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -311,10 +311,18 @@
                             <ComboBoxItem Content="Windows WASAPI"/>
                         </ComboBox>
                         <TextBlock Text="Latency:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
-                        <ComboBox IsEnabled="{Binding LatencyEnabled}" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                  SelectedValuePath="Content" Grid.Row="4" Grid.Column="1" Margin="-6,0,0,5" 
-                                  Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" Height="30">
-                                <ComboBox.Resources>
+                        <ComboBox IsEnabled="{Binding LatencyEnabled}" 
+          SelectedValue="{Binding SelectedLatency, Mode=TwoWay}" 
+          Style="{StaticResource ComboBoxStyle}" 
+          ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+          SelectedValuePath="Content" 
+          Grid.Row="4" Grid.Column="1" 
+          Margin="-6,0,0,5" 
+          Background="#0b1220" 
+          Foreground="#94a3b8" 
+          BorderThickness="0" 
+          Height="30">
+                            <ComboBox.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="4"/>
                                 </Style>
@@ -404,6 +412,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Capture all audio heard through:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
+                    
                         <ComboBox Grid.Row="0" Grid.Column="1"
                                   Margin="-6,0,0,5"
                                   Background="Transparent"
@@ -412,12 +421,9 @@
                                   Height="30"
                                   Style="{StaticResource ComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                  SelectedValuePath="Content"
-                                  SelectedIndex="0">
-                            <ComboBoxItem Content="System Default"/>
-                            <!--<ComboBoxItem Content="System Default-Headphones(High Definition Audio Device)"/>
-                            <ComboBoxItem Content="Headphones(High Definition Audio Device)"/>-->
-                        </ComboBox>
+                                  ItemsSource="{Binding SystemAudioDevices}"
+                                  SelectedItem="{Binding SelectedSystemAudioDevice, Mode=TwoWay}"/>
+
                     </Grid>
                 </StackPanel>
             </Border>

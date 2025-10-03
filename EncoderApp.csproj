@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ApplicationSetting.xml" />
     <None Remove="Images\audio.png" />
     <None Remove="Images\Checkmark_Icon.png" />
     <None Remove="Images\close.png" />
@@ -34,6 +35,17 @@
     <None Remove="Images\StreamConnection_Icon.png" />
     <None Remove="Images\system_audio.png" />
     <None Remove="Images\volume-Mixer.png" />
+    <None Remove="StreamsData.xml" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ApplicationSetting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="StreamsData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

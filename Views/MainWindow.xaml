@@ -621,7 +621,7 @@
             <Grid.RenderTransform>
                 <TranslateTransform x:Name="OverlayTransform" />
             </Grid.RenderTransform>
-            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" Width="600" Padding="0" BorderBrush="#0b1220" BorderThickness="1">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" Width="680" Padding="0" BorderBrush="#0b1220" BorderThickness="1">
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>

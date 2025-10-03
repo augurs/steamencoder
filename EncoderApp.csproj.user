@@ -8,6 +8,9 @@
     <Compile Update="Views\AudioPreferences.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\CustomMessageBox.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\EncoderSettings.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

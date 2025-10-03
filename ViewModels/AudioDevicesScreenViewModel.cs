@@ -1,40 +1,46 @@
 ﻿using EncoderApp.Models;
 using EncoderApp.Services;
+using EncoderApp.Views;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
 namespace EncoderApp.ViewModels
 {
-    public class AudioDevicesScreenViewModel: INotifyPropertyChanged
+    public class AudioDevicesScreenViewModel : INotifyPropertyChanged
     {
-        #region Audio Playback
+        #region Fields
         private bool _enableAudio = true;
         private string _selectedAudioApi = "Windows WASAPI";
         private bool _latencyEnabled;
-        private bool _showUnsupportedSamplerates=false;
+        private bool _showUnsupportedSampleRates = false;
         private string _selectedInputSampleRate;
-        public string SelectedInputSampleRate
+        private string _selectedOutputSampleRate;
+        private string _selectedLatency = "Default";
+        private bool _enableInputAudio = true;
+        private bool _showMonoInputs;
+        private bool _enableSystemAudioCapture = true;
+        private string _selectedSystemAudioDevice;
+        private bool _isRestoringSettings = false;
+        private int _selectedDeviceIndex = 0;
+        #endregion
+
+        #region Collections
+        public ObservableCollection<string> InputSampleRates { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> OutputSampleRates { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> SystemAudioDevices { get; set; } = new ObservableCollection<string>
         {
-            get => _selectedInputSampleRate;
-            set
-            {
-                if (_selectedInputSampleRate != value)
-                {
-                    _selectedInputSampleRate = value;
+            "System Default",
+            "Speakers (Realtek High Definition Audio)",
+            "Headphones (High Definition Audio Device)"
+        };
+        #endregion
 
-                    OnPropertyChanged();
-                    AppConfigurationManager.WriteValue("SelectedInputSampleRate", _selectedInputSampleRate);
-
-                }
-            }
-        }
+        #region Properties
 
         public bool EnableAudio
         {
@@ -45,10 +51,10 @@ namespace EncoderApp.ViewModels
                 {
                     _enableAudio = value;
                     OnPropertyChanged();
-                  
                 }
             }
         }
+
         public string SelectedAudioApi
         {
             get => _selectedAudioApi;
@@ -58,11 +64,30 @@ namespace EncoderApp.ViewModels
                 {
                     _selectedAudioApi = value;
                     OnPropertyChanged();
-                    UpdateLatencyEnabled();
-                    AppConfigurationManager.WriteValue("SelectedAudioApi", _selectedAudioApi);
+                    if (!_isRestoringSettings)
+                    {
+                        UpdateLatencyEnabled();
+                        AppConfigurationManager.WriteValue("SelectedAudioApi", _selectedAudioApi);
+                    }
                 }
             }
         }
+
+        public string SelectedLatency
+        {
+            get => _selectedLatency;
+            set
+            {
+                if (_selectedLatency != value)
+                {
+                    _selectedLatency = value;
+                    OnPropertyChanged();
+                    if (!_isRestoringSettings)
+                        AppConfigurationManager.WriteValue("SelectedLatency", _selectedLatency);
+                }
+            }
+        }
+
         public bool LatencyEnabled
         {
             get => _latencyEnabled;
@@ -76,25 +101,38 @@ namespace EncoderApp.ViewModels
                 }
             }
         }
+
         public bool ShowUnsupportedSamplerates
         {
-            get => _showUnsupportedSamplerates;
+            get => _showUnsupportedSampleRates;
             set
             {
-                if (_showUnsupportedSamplerates != value)
+                if (_showUnsupportedSampleRates != value)
                 {
-                    _showUnsupportedSamplerates = value;
+                    _showUnsupportedSampleRates = value;
                     OnPropertyChanged();
                     UpdateSampleRates();
+                    if (!_isRestoringSettings)
+                        AppConfigurationManager.WriteValue("ShowUnsupportedSamplerates", _showUnsupportedSampleRates.ToString());
                 }
             }
         }
-        public ObservableCollection<string> InputSampleRates { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> OutputSampleRates { get; } = new ObservableCollection<string>();
 
-        #endregion
-        #region Audio Input
-        private string _selectedOutputSampleRate;
+        public string SelectedInputSampleRate
+        {
+            get => _selectedInputSampleRate;
+            set
+            {
+                if (_selectedInputSampleRate != value)
+                {
+                    _selectedInputSampleRate = value;
+                    OnPropertyChanged();
+                    if (!_isRestoringSettings && !string.IsNullOrEmpty(value))
+                        AppConfigurationManager.WriteValue("SelectedInputSampleRate", value);
+                }
+            }
+        }
+
         public string SelectedOutputSampleRate
         {
             get => _selectedOutputSampleRate;
@@ -108,7 +146,6 @@ namespace EncoderApp.ViewModels
             }
         }
 
-        private bool _enableInputAudio = true;
         public bool EnableInputAudio
         {
             get => _enableInputAudio;
@@ -122,23 +159,21 @@ namespace EncoderApp.ViewModels
                 }
             }
         }
-        private bool _ShowMonoInputs;
+
         public bool ShowMonoInputs
         {
-            get => _ShowMonoInputs;
+            get => _showMonoInputs;
             set
             {
-                if (_ShowMonoInputs != value)
+                if (_showMonoInputs != value)
                 {
-                    _ShowMonoInputs = value;
+                    _showMonoInputs = value;
                     OnPropertyChanged();
-                    checksShowMonoInputs();
+                    HandleMonoInputs();
                 }
             }
         }
-        #endregion
-        #region OtherApplication
-        private bool _enableSystemAudioCapture = true;
+
         public bool EnableSystemAudioCapture
         {
             get => _enableSystemAudioCapture;
@@ -148,50 +183,68 @@ namespace EncoderApp.ViewModels
                 {
                     _enableSystemAudioCapture = value;
                     OnPropertyChanged();
-                    // Update audio capture state if needed
+                    AppConfigurationManager.WriteValue("EnableSystemAudioCapture", value.ToString());
                     UpdateSystemAudioCapture();
                 }
             }
         }
 
+        public string SelectedSystemAudioDevice
+        {
+            get => _selectedSystemAudioDevice;
+            set
+            {
+                if (_selectedSystemAudioDevice != value)
+                {
+                    _selectedSystemAudioDevice = value;
+                    OnPropertyChanged();
+                    if (!_isRestoringSettings && !string.IsNullOrEmpty(value))
+                        AppConfigurationManager.WriteValue("SelectedSystemAudioDevice", value);
+                }
+            }
+        }
         #endregion
-        private bool _isRestoringSettings = false;
 
+        #region Constructor
         public AudioDevicesScreenViewModel()
         {
             _isRestoringSettings = true;
-            string savedApi = AppConfigurationManager.ReadValue("SelectedAudioApi");
-            if (!string.IsNullOrEmpty(savedApi))
-                _selectedAudioApi = savedApi;
 
-            string savedInputRate = AppConfigurationManager.ReadValue("SelectedInputSampleRate");
-            if (!string.IsNullOrEmpty(savedInputRate))
-                _selectedInputSampleRate = savedInputRate;
-
-            string savedLatency = AppConfigurationManager.ReadValue("LatencyEnabled");
-            if (!string.IsNullOrEmpty(savedLatency) && bool.TryParse(savedLatency, out bool latency))
-                _latencyEnabled = latency;
-
+            RestoreSettings();
             UpdateSampleRates();
-
-            if (InputSampleRates.Contains(_selectedInputSampleRate))
-                SelectedInputSampleRate = _selectedInputSampleRate;
-            else
-                SelectedInputSampleRate = InputSampleRates[0];
-
-            if (!string.IsNullOrEmpty(_selectedAudioApi))
-                SelectedAudioApi = _selectedAudioApi;
-
+            SelectedInputSampleRate = InputSampleRates.Contains(_selectedInputSampleRate) ? _selectedInputSampleRate : InputSampleRates[0];
+            SelectedLatency = new[] { "Default", "Low", "High" }.Contains(_selectedLatency) ? _selectedLatency : "Default";
+            SelectedAudioApi = _selectedAudioApi;
             _isRestoringSettings = false;
 
             AudioInputCapture();
         }
+        #endregion
+
+        #region Methods
+        private void RestoreSettings()
+        {
+            _selectedAudioApi = AppConfigurationManager.ReadValue("SelectedAudioApi") ?? _selectedAudioApi;
+            _selectedInputSampleRate = AppConfigurationManager.ReadValue("SelectedInputSampleRate") ?? _selectedInputSampleRate;
+            _selectedLatency = AppConfigurationManager.ReadValue("SelectedLatency") ?? _selectedLatency;
+
+            if (bool.TryParse(AppConfigurationManager.ReadValue("LatencyEnabled"), out bool latency))
+                _latencyEnabled = latency;
+
+            if (bool.TryParse(AppConfigurationManager.ReadValue("ShowUnsupportedSamplerates"), out bool showUnsupported))
+                _showUnsupportedSampleRates = showUnsupported;
+
+            _selectedSystemAudioDevice = AppConfigurationManager.ReadValue("SelectedSystemAudioDevice") ?? "System Default";
+            if (!SystemAudioDevices.Contains(_selectedSystemAudioDevice))
+                _selectedSystemAudioDevice = "System Default";
+
+            if (bool.TryParse(AppConfigurationManager.ReadValue("EnableSystemAudioCapture"), out bool sysAudio))
+                _enableSystemAudioCapture = sysAudio;
+        }
 
         private void UpdateLatencyEnabled()
         {
-            if (_isRestoringSettings)
-                return;
-
+            if (_isRestoringSettings) return;
             LatencyEnabled = SelectedAudioApi == "ASIO" || SelectedAudioApi == "Windows WASAPI";
         }
 
@@ -202,7 +255,6 @@ namespace EncoderApp.ViewModels
 
             InputSampleRates.Add("Device Default (Recommended)");
             InputSampleRates.Add("44100");
-
             OutputSampleRates.Add("Device Default (Recommended)");
             OutputSampleRates.Add("44100");
 
@@ -210,12 +262,10 @@ namespace EncoderApp.ViewModels
             {
                 InputSampleRates.Add("48000");
                 InputSampleRates.Add("96000");
-
                 OutputSampleRates.Add("48000");
                 OutputSampleRates.Add("96000");
             }
 
-            // Only set SelectedInputSampleRate if it's null or invalid
             if (string.IsNullOrEmpty(SelectedInputSampleRate) || !InputSampleRates.Contains(SelectedInputSampleRate))
                 SelectedInputSampleRate = InputSampleRates[0];
 
@@ -223,49 +273,58 @@ namespace EncoderApp.ViewModels
                 SelectedOutputSampleRate = OutputSampleRates[0];
         }
 
-        private void checksShowMonoInputs()
+        private void HandleMonoInputs()
         {
-            if (ShowMonoInputs == true)
-            {
-                EnableInputAudio = false;
-                SelectedAudioApi = "Windows WDM-KS";
-            }
-            else
-            {
-                EnableInputAudio = true;
-                SelectedAudioApi = "Windows WASAPI";
-            }
+            EnableInputAudio = !ShowMonoInputs;
+            SelectedAudioApi = ShowMonoInputs ? "Windows WDM-KS" : "Windows WASAPI";
             UpdateSampleRates();
         }
-        private void UpdateSystemAudioCapture()
+
+        private async void UpdateSystemAudioCapture()
         {
-            if (EnableSystemAudioCapture)
+            AppConfigurationManager.WriteValue("OthersApplicationInput", EnableSystemAudioCapture ? "Yes" : "No");
+            await Task.Run(() =>
             {
-                OtherAppAudioCaptureService.Instance.Start(selectedDeviceIndex); 
-            }
-            else
-            {
-                OtherAppAudioCaptureService.Instance.Stop();
-            }
+                try
+                {
+                    if (EnableSystemAudioCapture)
+                    { 
+                        Debug.WriteLine($"Starting system audio capture with device index {_selectedDeviceIndex}");
+                        OtherAppAudioCaptureService.Instance.Start(_selectedDeviceIndex);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Stopping system audio capture");
+                        OtherAppAudioCaptureService.Instance.Stop();
+                   
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error in UpdateSystemAudioCapture: {ex.Message}");
+                    // Notify user on UI thread
+                    Application.Current.Dispatcher.Invoke(() =>
+                        CustomMessageBox.ShowInfo($"Error changing system audio capture: {ex.Message}", "Error")
+                    );
+                }
+            });
         }
-        int selectedDeviceIndex = 0;
-       
+
         private void AudioInputCapture()
         {
-            if (EnableInputAudio)
-            {
-               AppConfigurationManager.WriteValue("AudioInput", "Yes");
-               AudioInputCaptureService.Instance.Start(selectedDeviceIndex);
-            }  
-            else
-            {
-                AppConfigurationManager.WriteValue("AudioInput", "No");
-                AudioInputCaptureService.Instance.Stop();
-            }
+            AppConfigurationManager.WriteValue("AudioInput", EnableInputAudio ? "Yes" : "No");
 
+            if (EnableInputAudio)
+                AudioInputCaptureService.Instance.Start(_selectedDeviceIndex);
+            else
+                AudioInputCaptureService.Instance.Stop();
         }
+        #endregion
+
+        #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        #endregion
     }
 }
