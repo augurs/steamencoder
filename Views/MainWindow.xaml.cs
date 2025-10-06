@@ -41,7 +41,6 @@ namespace EncoderApp.Views
         private DateTime _lastMicUpdate = DateTime.MinValue;
         private DateTime _lastAppUpdate = DateTime.MinValue;
 
-
         public MainWindow()
         {
             InitializeComponent();
@@ -72,6 +71,11 @@ namespace EncoderApp.Views
                             UpdateVUMeter(MasterVU, normalizedLevel * (float)(otherAppsSliderValue / 100.0));
                     }
                 });
+            };
+            AudioInputCaptureService.Instance.OnError += (msg) =>
+            {
+                if (!Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
+                    CustomMessageBox.ShowInfo(msg, "Error");
             };
 
         }
@@ -141,14 +145,15 @@ namespace EncoderApp.Views
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+
             this.Close();
+
         }
         #endregion
 
         #region Streams
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-           
             if (sender is Border border && border.DataContext is StreamInfo stream)
             {
                 bool isConnected = stream.IsConnected;
@@ -191,13 +196,41 @@ namespace EncoderApp.Views
         }
         private void ok_click(object sender, RoutedEventArgs e)
         {
-            PreferencesModalOverlay.Visibility = Visibility.Collapsed;
-        } 
+            ApplySettings(); 
+            PreferencesModalOverlay.Visibility = Visibility.Collapsed; 
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            PreferencesModalOverlay.Visibility = Visibility.Collapsed; 
+        }
+
         private void Apply_click(object sender, RoutedEventArgs e)
         {
-            PreferencesModalOverlay.Visibility = Visibility.Collapsed;
+            ApplySettings();
+            applyPrefencecsbtn.IsEnabled = false;
+            applyPrefencecsbtn.Opacity = 0.5; 
         }
-        
+
+        private void ApplySettings()
+        {
+            var vm = Preferences.DataContext as AudioDevicesScreenViewModel;
+            if (vm != null)
+            {
+                AppConfigurationManager.WriteValue("EnableAudio", vm.EnableAudio.ToString());
+                AppConfigurationManager.WriteValue("SelectedPlaybackDevice", vm.SelectedPlaybackDevice ?? "");
+                AppConfigurationManager.WriteValue("SelectedAudioApi", vm.SelectedAudioApi);
+                AppConfigurationManager.WriteValue("SelectedLatency", vm.SelectedLatency);
+                AppConfigurationManager.WriteValue("SelectedInputDevice", vm.SelectedInputDevice ?? "");
+                AppConfigurationManager.WriteValue("SelectedInputSampleRate", vm.SelectedInputSampleRate);
+                AppConfigurationManager.WriteValue("EnableSystemAudioCapture", vm.EnableSystemAudioCapture.ToString());
+                vm.UpdateLatencyEnabled();
+                vm.LoadPlaybackDevices();
+                vm.AudioInputCapture();
+                vm.UpdateSystemAudioCapture();
+            }
+        }
+
         #endregion
 
         #region BroadcastButtons
@@ -711,21 +744,15 @@ namespace EncoderApp.Views
                     micCapture.StartRecording();
                     AudioInputCaptureService.Instance.Start();
                 }
-            
-                if (!_isOtherAppsMuted  && _audioDevicesViewModel.EnableSystemAudioCapture)
+
+                if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
                 {
-                    if (appCapture == null)
-                    {
-                        appCapture = new WasapiLoopbackCapture();
-                        appCapture.DataAvailable += App_DataAvailable;
-                        appCapture.StartRecording();
-                    }
+                    OtherAppAudioCaptureService.Instance.Start();
                 }
             }
             catch (Exception ex)
             {
-                CustomMessageBox.ShowInfo($"Error starting audio: {ex.Message}", "Error");
-
+                //CustomMessageBox.ShowInfo($"Error starting audio:  {ex.Message}", "Error");
             }
         }
 
@@ -755,7 +782,6 @@ namespace EncoderApp.Views
                     UpdateVUMeter(MasterVU, max * (float)(audioInputSliderValue / 100.0));
             });
 
-            _lastMicUpdate = DateTime.Now;
         }
         private void App_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
         {
@@ -800,11 +826,16 @@ namespace EncoderApp.Views
             {
                 micCapture?.StopRecording();
                 micCapture?.Dispose();
+               
                 micCapture = null;
             }
-            catch (Exception ex) {/* Debug.WriteLine($"Dispose mic capture error: {ex.Message}");*/ }
+            catch (Exception ex) 
+            { 
+                //CustomMessageBox.ShowInfo($"Dispose mic capture error: {ex.Message}","Error"); 
+            }
 
             base.OnClosed(e);
+         
         }
 
 

@@ -127,7 +127,7 @@
                                             MinWidth="{TemplateBinding ActualWidth}"
                                             SnapsToDevicePixels="True"
                                             Background="#445370"
-                                            Margin="0,1,0,0" Width="148" >
+                                            Margin="0,1,0,0" Width="200" >
                                         <Border 
                                               BorderThickness="1"
                                               Background="#131d2f"/>
@@ -233,7 +233,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,0,0,0" Background="Transparent">
                         <TextBlock Text="Audio Playback" FontWeight="Bold" Foreground="#3498db" FontSize="12" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <CheckBox x:Name="EnableAudioCheck" Content="Enable Audio Output Device" IsChecked="{Binding EnableAudio, Mode=TwoWay}" Margin="0,15,0,10" Foreground="#94a3b8"/>
+                    <CheckBox x:Name="EnableAudioCheck" Content="Enable Audio Output Device"  IsChecked="{Binding EnableAudio, Mode=TwoWay}" Margin="0,15,0,10" Foreground="#94a3b8"/>
                     <Grid Margin="0,5,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
@@ -247,24 +247,32 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Playback Device:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
-                        <ComboBox IsEnabled="{Binding EnableAudio}" Grid.Row="0" Grid.Column="1" 
-                                  Margin="-6,0,0,5"
+                        <ComboBox IsEnabled="{Binding EnableAudio}"
+                                  ItemsSource="{Binding PlaybackDevices}"
+                                  SelectedItem="{Binding SelectedPlaybackDevice, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                  Grid.Row="0" Grid.Column="1" 
+                                  Margin="-6,0,0,0"
                                   Background="Transparent"
                                   Foreground="#94a3b8"
                                   BorderThickness="0"
-                                  SelectedValuePath="Content"
                                   Height="30"
                                   Style="{StaticResource ComboBoxStyle}"
-                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                  SelectedIndex="0"
-                                  IsReadOnly="True">
-                            <ComboBoxItem Content="Windows Default" Foreground="#94a3b8"/>
+                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" 
+                                               TextWrapping="Wrap" 
+                                               ToolTip="{Binding}" 
+                                               VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
                         </ComboBox>
+
                         <TextBlock Text="Samplerate:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
                         <ComboBox IsEnabled="{Binding EnableAudio}" 
                                   x:Name="StockStatusComboBox"
-                                  ItemsSource="{Binding InputSampleRates}"
-                                  SelectedItem="{Binding SelectedInputSampleRate, Mode=TwoWay}"
+                                  ItemsSource="{Binding OutputSampleRates}"
+                                  SelectedItem="{Binding SelectedOutputSampleRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Style="{StaticResource ComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource CleanComboBoxItem}"
                                   Height="30"
@@ -280,10 +288,9 @@
                                   Grid.Column="1"
                                   Grid.ColumnSpan="2" 
                                   Margin="-6,0,0,0"/>
-
                         <CheckBox Content="Show unsupported samplerates"
                                   IsEnabled="{Binding EnableAudio}"
-                                  IsChecked="{Binding ShowUnsupportedSamplerates, Mode=TwoWay}"
+                                  IsChecked="{Binding ShowUnsupportedSamplerates, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Grid.Row="2"
                                   Grid.Column="1"
                                   Margin="5"
@@ -300,36 +307,33 @@
                             </CheckBox.Style>
                         </CheckBox>
 
-                        <TextBlock Text="Audio API:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
-                        <ComboBox SelectedValue="{Binding SelectedAudioApi, Mode=TwoWay}" Grid.Row="3" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                  SelectedValuePath="Content" Grid.Column="1" Margin="-6,0,0,5" SelectedIndex="0" Background="Transparent"
-                                  Foreground="#94a3b8" BorderThickness="0" Height="30"  Grid.ColumnSpan="2">
-                            <ComboBoxItem Content="MME"/>
-                            <ComboBoxItem Content="Windows DirectSound"/>
-                            <ComboBoxItem Content="ASIO"/>
-                            <ComboBoxItem Content="Windows WDM-KS"/>
-                            <ComboBoxItem Content="Windows WASAPI"/>
-                        </ComboBox>
-                        <TextBlock Text="Latency:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
+                        <TextBlock Text="Audio API:" Grid.Row="3" Margin="0,6,0,0" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8"/>
+                        <ComboBox ItemsSource="{Binding AudioApis}"  
+                                  SelectedItem="{Binding SelectedAudioApi, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                  Grid.Row="3" 
+                                  Style="{StaticResource ComboBoxStyle}" 
+                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                  Height="30"
+                                  Background="Transparent"
+                                  Foreground="#94a3b8"
+                                  BorderThickness="0" Grid.ColumnSpan="2" Margin="198,2,4,25" Grid.RowSpan="2"/>
+                        <TextBlock Text="Latency:" Grid.Row="4"  Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8" Margin="0,18,0,0"/>
                         <ComboBox IsEnabled="{Binding LatencyEnabled}" 
-          SelectedValue="{Binding SelectedLatency, Mode=TwoWay}" 
-          Style="{StaticResource ComboBoxStyle}" 
-          ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-          SelectedValuePath="Content" 
-          Grid.Row="4" Grid.Column="1" 
-          Margin="-6,0,0,5" 
-          Background="#0b1220" 
-          Foreground="#94a3b8" 
-          BorderThickness="0" 
-          Height="30">
+                                  ItemsSource="{Binding Latencies}" 
+                                  SelectedItem="{Binding SelectedLatency, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                  Style="{StaticResource ComboBoxStyle}" 
+                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                  Grid.Row="4" 
+                                  Margin="198,12,4,-3" 
+                                  Background="#0b1220" 
+                                  Foreground="#94a3b8" 
+                                  BorderThickness="0" 
+                                  Height="30" Grid.ColumnSpan="2">
                             <ComboBox.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="4"/>
                                 </Style>
                             </ComboBox.Resources>
-                            <ComboBoxItem Content="Default"/>
-                            <ComboBoxItem Content="Low"/>
-                            <ComboBoxItem Content="High"/>
                         </ComboBox>
                     </Grid>
                 </StackPanel>
@@ -339,7 +343,8 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,0,0,0" Background="Transparent">
                         <TextBlock Text="Audio Input" Foreground="#3498db" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <CheckBox x:Name="EnableInputCheck" Content="Enable Audio Input Device" IsChecked="{Binding EnableInputAudio, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="0,15,0,10" Foreground="#94a3b8"/>
+                    <CheckBox x:Name="EnableInputCheck" Content="Enable Audio Input Device" 
+                              IsChecked="{Binding EnableInputAudio, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="0,15,0,10" Foreground="#94a3b8"/>
                     <Grid IsEnabled="{Binding IsChecked, ElementName=EnableInputCheck}" Margin="0,5,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
@@ -351,12 +356,21 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Input Device:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="-6,0,0,0" Background="Transparent" Foreground="#94a3b8"
-                                  BorderThickness="0" SelectedValuePath="Content" Height="30" Style="{StaticResource ComboBoxStyle}"
-                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0">
-                            <ComboBoxItem Content="Windows Default"/>
-                        </ComboBox>
-                        <CheckBox IsEnabled="{Binding EnableInputAudio}" IsChecked="{Binding ShowMonoInputs, Mode=TwoWay}" Content="Show mono inputs" Grid.Row="1" Grid.Column="1" Margin="5" Foreground="#94a3b8">
+                        <ComboBox ItemsSource="{Binding InputDevices}" 
+                                  SelectedItem="{Binding SelectedInputDevice, Mode=TwoWay}" 
+                                  Grid.Row="0" Grid.Column="1" 
+                                  Margin="-6,0,0,0"
+                                  Background="Transparent"
+                                  Foreground="#94a3b8"
+                                  BorderThickness="0"
+                                  Height="30"
+                                  Style="{StaticResource ComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"/>
+
+                        <CheckBox  
+                            IsEnabled="{Binding EnableInputAudio}" 
+                                  IsChecked="{Binding ShowMonoInputs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Content="Show mono inputs" Grid.Row="1" Grid.Column="1" Margin="5" Foreground="#94a3b8">
                             <CheckBox.Style>
                                 <Style TargetType="CheckBox">
                                     <Setter Property="Opacity" Value="1"/>
@@ -369,37 +383,23 @@
                             </CheckBox.Style>
                         </CheckBox>
                         <TextBlock Text="Samplerate:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
-                        <ComboBox Grid.Row="2" Grid.Column="1"  
+                        <ComboBox ItemsSource="{Binding InputSampleRates}" 
+                                  SelectedItem="{Binding SelectedInputSampleRate, Mode=TwoWay}" 
+                                  Grid.Row="2" Grid.Column="1" 
                                   IsEnabled="{Binding EnableInputAudio}" 
-                                  ItemsSource="{Binding OutputSampleRates}"
-                                  SelectedItem="{Binding SelectedOutputSampleRate, Mode=TwoWay}"
-                                  Style="{StaticResource ComboBoxStyle}"
+                                  Style="{StaticResource ComboBoxStyle}" 
                                   ItemContainerStyle="{StaticResource CleanComboBoxItem}"
                                   Height="30"
-                                  VerticalAlignment="Center"
-                                  VerticalContentAlignment="Center"
                                   Background="Transparent"
                                   Foreground="#94a3b8"
                                   BorderThickness="0"
-                                  Padding="0,0"
-                                  FontSize="12"
                                   Margin="-6,0,0,0"/>
-
-
-
-                        <!--<ComboBoxItem Content="Device Default (Recommended)" />
-                            <ComboBoxItem Content="44100" />-->
-
                     </Grid>
                 </StackPanel>
             </Border>
             <Border Grid.Row="2" BorderBrush="#212a3b" Height="105" Background="#131d2f" BorderThickness="1.5" Padding="0" CornerRadius="4" Margin="5,0,5,0">
                 <StackPanel Margin="10">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,0,0,0" Background="Transparent">
-                        <!--<Image Source="/Images/system_audio.png"
-                               Width="20" Height="20"
-                               VerticalAlignment="Center"
-                               Margin="0,0,5,0"/>-->
                         <TextBlock Text="System Audio Capture (Other Applications)" Foreground="#3498db" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                     </StackPanel>
                     <CheckBox x:Name="EnableSystemCaptureCheck" Content="Enable System Audio Capture" IsChecked="{Binding EnableSystemAudioCapture, Mode=TwoWay}" Margin="0,10,0,10" Foreground="#94a3b8"/>
@@ -412,17 +412,16 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Capture all audio heard through:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Foreground="#94a3b8"/>
-                    
-                        <ComboBox Grid.Row="0" Grid.Column="1"
+                        <ComboBox ItemsSource="{Binding SystemAudioDevices}" 
+                                  SelectedItem="{Binding SelectedSystemAudioDevice, Mode=TwoWay}"
+                                  Grid.Row="0" Grid.Column="1"
                                   Margin="-6,0,0,5"
                                   Background="Transparent"
                                   Foreground="#94a3b8"
                                   BorderThickness="0"
                                   Height="30"
                                   Style="{StaticResource ComboBoxStyle}"
-                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                  ItemsSource="{Binding SystemAudioDevices}"
-                                  SelectedItem="{Binding SelectedSystemAudioDevice, Mode=TwoWay}"/>
+                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"/>
 
                     </Grid>
                 </StackPanel>

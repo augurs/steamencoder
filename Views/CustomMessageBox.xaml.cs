@@ -16,7 +16,6 @@ namespace EncoderApp.Views
             txtTitle.Text = titleType;
             ApplyIcon(titleType);
 
-            // Hide Cancel button if not needed
             CancelButton.Visibility = showCancel ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -54,16 +53,15 @@ namespace EncoderApp.Views
 
         private void Header_CloseClicked(object sender, RoutedEventArgs e)
         {
-            CancelClicked?.Invoke(this, e);
+            OkClicked?.Invoke(this, e);
         }
 
-        // OK-only
         public static void ShowInfo(string message, string titleType)
         {
             Window window = new Window
             {
                 Content = new CustomMessageBox(message, titleType, showCancel: false),
-                Width = 310,
+                Width = 330,
                 Height= 200,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
                 WindowStyle = WindowStyle.None,
@@ -79,8 +77,7 @@ namespace EncoderApp.Views
 
             window.ShowDialog();
         }
-
-        // OK + Cancel
+      
         public static bool ShowConfirmation(string message, string titleType)
         {
             bool result = false;
@@ -88,7 +85,7 @@ namespace EncoderApp.Views
             Window window = new Window
             {
                 Content = new CustomMessageBox(message, titleType, showCancel: true),
-                Width = 310,
+                Width = 330,
                 Height= 200,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
                 WindowStyle = WindowStyle.None,

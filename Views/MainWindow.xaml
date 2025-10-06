@@ -360,7 +360,6 @@
                                 <Image Source="/Images/error_Icon.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <StackPanel Margin="20,-10,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock Text="Error" Margin="0,0,0,0" FontSize="30" Foreground="#94a3b8" FontWeight="SemiBold"/>
-                                    <!--<TextBlock x:Name="streamErrorText" Margin="0,-5,0,0" FontSize="14" Foreground="#94a3b8" FontWeight="SemiBold"/>-->
                                     <TextBlock Text="Some error occurred." FontSize="12" Foreground="#94a3b8"/>
                                 </StackPanel>
                             </StackPanel>
@@ -633,24 +632,21 @@
                     </Grid>
                     <local:AudioPreferences x:Name="Preferences" Grid.Row="1"/>
                     <StackPanel Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,5,0" Height="45">
-                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Click="ok_click"/>
-                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Margin="5,0,5,0" Click="cancel_Click"/>
-                        <Button Content="Apply" Style="{StaticResource DarkButtonStyle}" Height="26" Margin="0,0,5,0" Click="Apply_click"/>
+                        <Button x:Name="okPreferncesbtn" Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Click="ok_click"/>
+                        <Button x:Name="cancelPreferncesbtn" Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Margin="5,0,5,0" Click="cancel_Click"/>
+                        <Button x:Name="applyPrefencecsbtn" Content="Apply" Style="{StaticResource DarkButtonStyle}" Height="26" Margin="0,0,5,0" Click="Apply_click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
 
         <Grid x:Name="StreamsModalOverlay" 
-      HorizontalAlignment="Stretch" 
-      VerticalAlignment="Stretch" 
-      Visibility="Collapsed">
-
-            <!-- 👇 Add RenderTransform for dragging -->
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch" 
+              Visibility="Collapsed">
             <Grid.RenderTransform>
                 <TranslateTransform x:Name="StreamsOverlayTransform"/>
             </Grid.RenderTransform>
-
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -663,25 +659,21 @@
             </Grid.Style>
 
             <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
-            Background="#0b1220" Width="750" Padding="0" 
-            BorderBrush="#0b1220" BorderThickness="1">
+                    Background="#0b1220" Width="750" Padding="0" 
+                    BorderBrush="#0b1220" BorderThickness="1">
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-
-                    <!-- 👇 Add drag events on header row -->
                     <Grid Grid.Row="0" Background="#0b1220"
-                  MouseLeftButtonDown="StreamsHeader_MouseLeftButtonDown"
-                  MouseMove="StreamsHeader_MouseMove"
-                  MouseLeftButtonUp="StreamsHeader_MouseLeftButtonUp">
+                          MouseLeftButtonDown="StreamsHeader_MouseLeftButtonDown"
+                          MouseMove="StreamsHeader_MouseMove"
+                          MouseLeftButtonUp="StreamsHeader_MouseLeftButtonUp">
                         <local:ModalHeader Title="Streams" CloseClicked="StreamsHeader_CloseClicked"/>
                     </Grid>
-
                     <local:Streams x:Name="StreamsControl" Grid.Row="1"/>
-
                     <StackPanel Background="#0b1220" Grid.Row="2" Orientation="Horizontal" 
                         HorizontalAlignment="Right" VerticalAlignment="Center" 
                         Margin="0,-10,10,0">
@@ -693,11 +685,10 @@
                 </Grid>
             </Border>
         </Grid>
-
         <Grid x:Name="AboutModalOverlay" 
-      HorizontalAlignment="Stretch" 
-      VerticalAlignment="Stretch" 
-      Visibility="Collapsed">
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch" 
+              Visibility="Collapsed">
             <Grid.RenderTransform>
                 <TranslateTransform x:Name="AboutOverlayTransform"/>
             </Grid.RenderTransform>
@@ -714,8 +705,8 @@
             </Grid.Style>
 
             <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
-            Background="#0b1220" Width="350" Padding="0" 
-            BorderBrush="#0b1220" BorderThickness="0">
+                    Background="#0b1220" Width="350" Padding="0" 
+                    BorderBrush="#0b1220" BorderThickness="0">
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
@@ -723,16 +714,13 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 👇 Add drag events on header row -->
                     <Grid Grid.Row="0" Background="#0b1220"
-                  MouseLeftButtonDown="AboutHeader_MouseLeftButtonDown"
-                  MouseMove="AboutHeader_MouseMove"
-                  MouseLeftButtonUp="AboutHeader_MouseLeftButtonUp">
+                          MouseLeftButtonDown="AboutHeader_MouseLeftButtonDown"
+                          MouseMove="AboutHeader_MouseMove"
+                          MouseLeftButtonUp="AboutHeader_MouseLeftButtonUp">
                         <local:ModalHeader Title="About" CloseClicked="AboutHeader_CloseClicked"/>
                     </Grid>
-
                     <local:About x:Name="AboutsControl" Grid.Row="1"/>
-
                     <StackPanel Background="#0b1220" Grid.Row="2" Orientation="Horizontal" 
                         HorizontalAlignment="Right" VerticalAlignment="Center" 
                         Margin="0,-10,10,0">
