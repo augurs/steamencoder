@@ -62,7 +62,7 @@ namespace EncoderApp.Views
             {
                 Content = new CustomMessageBox(message, titleType, showCancel: false),
                 Width = 330,
-                Height= 200,
+                Height = 190,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
                 WindowStyle = WindowStyle.None,
                 ResizeMode = ResizeMode.NoResize,
@@ -86,7 +86,7 @@ namespace EncoderApp.Views
             {
                 Content = new CustomMessageBox(message, titleType, showCancel: true),
                 Width = 330,
-                Height= 200,
+                Height = 190,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
                 WindowStyle = WindowStyle.None,
                 ResizeMode = ResizeMode.NoResize,

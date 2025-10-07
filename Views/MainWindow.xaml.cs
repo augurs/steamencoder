@@ -470,25 +470,33 @@ namespace EncoderApp.Views
         }
         private void AudioToggle_Click(object sender, MouseButtonEventArgs e)
         {
-            _isMicMuted = !_isMicMuted;
-            AudioToggleImage.Source = new BitmapImage(new Uri(
-                _isMicMuted ? "/Images/muteSpeaker_Icon.png" : "/Images/EnableSpeaker.png",
-                UriKind.Relative));
-            if (_isMicMuted)
+            try
             {
-                AudioInputCaptureService.Instance.Stop();
-                _previousAudioInputSliderValue = AudioSlider.Value;
-                AudioSlider.Value = 0;
-                captures?.StopRecording();
-            }
-            else
-            {
-                AudioSlider.Value = _previousAudioInputSliderValue;
-                if (_audioDevicesViewModel.EnableInputAudio)
+                _isMicMuted = !_isMicMuted;
+                AudioToggleImage.Source = new BitmapImage(new Uri(
+                    _isMicMuted ? "/Images/muteSpeaker_Icon.png" : "/Images/EnableSpeaker.png",
+                    UriKind.Relative));
+                if (_isMicMuted)
                 {
-                    AudioInputCaptureService.Instance.Start();
+                    AudioInputCaptureService.Instance.Stop();
+                    _previousAudioInputSliderValue = AudioSlider.Value;
+                    AudioSlider.Value = 0;
+                    captures?.StopRecording();
                 }
-                InitAudio();
+                else
+                {
+                    AudioSlider.Value = _previousAudioInputSliderValue;
+                    if (_audioDevicesViewModel.EnableInputAudio)
+                    {
+                        AudioInputCaptureService.Instance.Start();
+                    }
+                    InitAudio();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
         private void OtherAppsToggle_Click(object sender, MouseButtonEventArgs e)
@@ -509,6 +517,7 @@ namespace EncoderApp.Views
             if (_isOtherAppsMuted)
             {
                 OtherAppsSlider.Value = 0;
+                
                 OtherAppAudioCaptureService.Instance.Stop();
                 UpdateVUMeter(OtherApplicationsVU, 0);
                 if (!_isMasterMuted)

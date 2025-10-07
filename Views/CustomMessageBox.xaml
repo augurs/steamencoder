@@ -5,21 +5,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EncoderApp.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="180" d:DesignWidth="340">
+             MinHeight="150" MinWidth="260"
+             d:DesignHeight="180" d:DesignWidth="340"
+             HorizontalContentAlignment="Stretch"
+             VerticalContentAlignment="Top">
+
     <UserControl.Resources>
         <Style x:Key="DarkButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#3498db"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Height" Value="32"/>
-            <Setter Property="Width" Value="70"/>
+            <Setter Property="Padding" Value="10,5"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontFamily" Value="pack://application:,,,/Font/#Urbanist"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="MinWidth" Value="70"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}" 
                                 BorderBrush="{TemplateBinding BorderBrush}" 
                                 BorderThickness="{TemplateBinding BorderThickness}" 
                                 CornerRadius="6">
@@ -48,7 +54,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid >
+    <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                 <GradientStop Color="#071024" Offset="0"/>
@@ -59,47 +65,77 @@
             <EventTrigger RoutedEvent="Loaded">
                 <BeginStoryboard>
                     <Storyboard>
-                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3"/>
+                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                         From="0" To="1" 
+                                         Duration="0:0:0.3"/>
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>
         </Grid.Triggers>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <local:ModalHeader Grid.Row="0" VerticalAlignment="Top" 
+        <local:ModalHeader Grid.Row="0" 
                            Title="Message Box" 
+                           VerticalAlignment="Top"
                            CloseClicked="Header_CloseClicked"/>
-        <Border Background="#131d2f" Grid.Row="1"  BorderBrush="#212a3b" BorderThickness="0" 
-        CornerRadius="4" Padding="10" Margin="5,5,5,0"
-        HorizontalAlignment="Center" VerticalAlignment="Top"
-        Width="310">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,-5,0,5">
-                    <TextBlock x:Name="txtIcon" FontSize="18" Margin="0,0,6,0"/>
-                    <TextBlock x:Name="txtTitle" Foreground="#94a3b8" FontSize="16" FontWeight="Bold"/>
+
+        <Border Grid.Row="1" 
+                Background="#131d2f" 
+                BorderBrush="#212a3b" 
+                BorderThickness="0" 
+                CornerRadius="4" 
+                Padding="10" 
+                Margin="10,5,10,5"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                          MaxHeight="300">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Center" 
+                                Margin="0,-5,0,5">
+                        <TextBlock x:Name="txtIcon" FontSize="18" Margin="0,0,6,0"/>
+                        <TextBlock x:Name="txtTitle" 
+                                   Foreground="#94a3b8" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <Separator Background="#445370" 
+                               Height="1" 
+                               Margin="0,0,0,10"/>
+                    <TextBlock x:Name="txtMessage" 
+                               TextWrapping="Wrap"  
+                               FontSize="14"
+                               Foreground="#94a3b8" 
+                               TextAlignment="Center" 
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Stretch" 
+                               Margin="0,0,0,0"/>
                 </StackPanel>
-                <Separator Grid.Row="1" Background="#445370" Height="1" Margin="0,0,0,10"/>
-                <TextBlock x:Name="txtMessage" Grid.Row="2"
-                   TextWrapping="Wrap"  
-                   FontSize="14"
-                   Foreground="#94a3b8" 
-                   TextAlignment="Center" 
-                   VerticalAlignment="Top"
-                   HorizontalAlignment="Stretch" Margin="0,0,0,10"/>
-            </Grid>
+            </ScrollViewer>
         </Border>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,-55,10,10">
-            <Button x:Name="OkButton" Content="OK"  Height="25" Style="{StaticResource DarkButtonStyle}" Margin="5,0,5,5" Click="OkButton_Click"/>
-            <Button x:Name="CancelButton" Content="Cancel" Height="25"  Style="{StaticResource DarkCancelButtonStyle}" Margin="5,0,5,5" Click="CancelButton_Click"/>
+
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="0,0,4,8">
+            <Button x:Name="OkButton" 
+                    Content="OK"  
+                    Style="{StaticResource DarkButtonStyle}" 
+                    Margin="5,0" Height="25"
+                    Click="OkButton_Click"/>
+            <Button x:Name="CancelButton" 
+                    Content="Cancel" Height="25"
+                    Style="{StaticResource DarkCancelButtonStyle}" 
+                    Margin="5,0" 
+                    Click="CancelButton_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

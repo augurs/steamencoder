@@ -54,9 +54,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border"
-                      Background="{TemplateBinding Background}" 
-                      BorderBrush="{TemplateBinding BorderBrush}" 
-                      CornerRadius="3">
+                              Background="{TemplateBinding Background}" 
+                              BorderBrush="{TemplateBinding BorderBrush}" 
+                              CornerRadius="3">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -118,6 +118,5 @@
             </StackPanel>
         </Border>
         <ContentControl x:Name="MainContent" Background="#F0F0F0" Grid.Column="1"/>
-
     </Grid>
 </UserControl>
