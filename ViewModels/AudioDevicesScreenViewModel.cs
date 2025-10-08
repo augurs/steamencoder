@@ -95,7 +95,7 @@ namespace EncoderApp.ViewModels
                         AppConfigurationManager.WriteValue("SelectedAudioApi", value);
                         UpdateLatencyEnabled();
                         LoadPlaybackDevices();
-                        HandleAudioApiChange();
+                        _ = HandleAudioApiChangeAsync();
                     }
                 }
             }
@@ -135,9 +135,15 @@ namespace EncoderApp.ViewModels
             {
                 _enableInputAudio = value;
                 OnPropertyChanged();
-                AudioInputCapture();
                 if (!_isRestoringSettings)
+                {
                     AppConfigurationManager.WriteValue("EnableInputAudio", value.ToString());
+                    _ = AudioInputCaptureAsync();
+                }
+                else
+                {
+                    AudioInputCapture();
+                }
             }
         }
 
@@ -164,6 +170,10 @@ namespace EncoderApp.ViewModels
                 if (!_isRestoringSettings)
                 {
                     AppConfigurationManager.WriteValue("EnableSystemAudioCapture", value.ToString());
+                    _ = UpdateSystemAudioCaptureAsync();
+                }
+                else
+                {
                     UpdateSystemAudioCapture();
                 }
             }
@@ -341,36 +351,42 @@ namespace EncoderApp.ViewModels
 
         private void HandleMonoInputs()
         {
-          //  EnableInputAudio = !ShowMonoInputs;
+            //  EnableInputAudio = !ShowMonoInputs;
             SelectedAudioApi = ShowMonoInputs ? "Windows WDM-KS" : "Windows WASAPI";
             UpdateSampleRates();
         }
 
-        private void HandleAudioApiChange()
+        private async Task HandleAudioApiChangeAsync()
         {
             StopAsioPlayback();
             if (SelectedAudioApi == "ASIO")
-                StartAsioPlayback();
+            {
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        StartAsioPlayback();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"ASIO start error: {ex.Message}");
+                        Logger.LogError(ex);
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            CustomMessageBox.ShowInfo($"ASIO Playback Error: {ex.Message}", "Error")));
+                    }
+                });
+            }
         }
 
         private void StartAsioPlayback()
         {
-            try
-            {
-                if (string.IsNullOrEmpty(SelectedPlaybackDevice)) return;
-                _asioOut = new AsioOut(SelectedPlaybackDevice);
-                var silence = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
-                var mixer = new MixingSampleProvider(silence.WaveFormat) { ReadFully = true };
-                mixer.AddMixerInput(silence.ToSampleProvider());
-                _asioOut.Init(mixer);
-                _asioOut.Play();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ASIO start error: {ex.Message}");
-                Application.Current.Dispatcher.Invoke(() =>
-                  CustomMessageBox.ShowInfo($"ASIO Playback Error: {ex.Message}", "Error"));
-            }
+            if (string.IsNullOrEmpty(SelectedPlaybackDevice)) return;
+            _asioOut = new AsioOut(SelectedPlaybackDevice);
+            var silence = new SilenceProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
+            var mixer = new MixingSampleProvider(silence.WaveFormat) { ReadFully = true };
+            mixer.AddMixerInput(silence.ToSampleProvider());
+            _asioOut.Init(mixer);
+            _asioOut.Play();
         }
 
         private void StopAsioPlayback()
@@ -387,6 +403,29 @@ namespace EncoderApp.ViewModels
             }
         }
 
+        public async Task UpdateSystemAudioCaptureAsync()
+        {
+            AppConfigurationManager.WriteValue("OthersApplicationInput", EnableSystemAudioCapture ? "Yes" : "No");
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    if (EnableSystemAudioCapture)
+                        await Task.Run(() => OtherAppAudioCaptureService.Instance.Start(_selectedDeviceIndex));
+                    else
+                        OtherAppAudioCaptureService.Instance.Stop();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex);
+                    Debug.WriteLine($"Error in UpdateSystemAudioCapture: {ex.Message}");
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            CustomMessageBox.ShowInfo($"Error changing system audio capture: {ex.Message}", "Error")
+                         ));
+                }
+            });
+        }
+
         public void UpdateSystemAudioCapture()
         {
             AppConfigurationManager.WriteValue("OthersApplicationInput", EnableSystemAudioCapture ? "Yes" : "No");
@@ -401,13 +440,15 @@ namespace EncoderApp.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogError(ex);
                     Debug.WriteLine($"Error in UpdateSystemAudioCapture: {ex.Message}");
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                             CustomMessageBox.ShowInfo($"Error changing system audio capture: {ex.Message}", "Error")
-                         );
+                         ));
                 }
             });
         }
+
         private void UpdateSelectedDeviceIndex()
         {
             if (SelectedAudioApi == "Windows WASAPI")
@@ -420,6 +461,29 @@ namespace EncoderApp.ViewModels
             {
                 _selectedDeviceIndex = 0;
             }
+        }
+
+        public async Task AudioInputCaptureAsync()
+        {
+            AppConfigurationManager.WriteValue("AudioInput", EnableInputAudio ? "Yes" : "No");
+            UpdateSelectedDeviceIndex();
+            await Task.Run(() =>
+            {
+                try
+                {
+                    if (EnableInputAudio)
+                        AudioInputCaptureService.Instance.Start(_selectedDeviceIndex, SelectedAudioApi);
+                    else
+                        AudioInputCaptureService.Instance.Stop();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex);
+                    Debug.WriteLine($"Error in AudioInputCapture: {ex.Message}");
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        CustomMessageBox.ShowInfo($"Error in audio input capture: {ex.Message}", "Error")));
+                }
+            });
         }
 
         public void AudioInputCapture()

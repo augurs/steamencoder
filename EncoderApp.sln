@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncoderApp", "EncoderApp.csproj", "{F2F069D2-8831-4E69-B1D4-9EF91338F49B}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "StreamEncoder", "..\StreamEncoder\StreamEncoder.vdproj", "{3D0FB89E-21EB-23A6-692C-67B586381AC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{F2F069D2-8831-4E69-B1D4-9EF91338F49B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2F069D2-8831-4E69-B1D4-9EF91338F49B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2F069D2-8831-4E69-B1D4-9EF91338F49B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D0FB89E-21EB-23A6-692C-67B586381AC7}.Debug|Any CPU.ActiveCfg = Debug
+		{3D0FB89E-21EB-23A6-692C-67B586381AC7}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

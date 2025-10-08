@@ -1,4 +1,5 @@
-﻿using EncoderApp.Views;
+﻿using EncoderApp.Models;
+using EncoderApp.Views;
 using NAudio.Wave;
 using System.Windows;
 
@@ -87,10 +88,19 @@ public class AudioInputCaptureService
 
     private void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
     {
-        if (e.Exception != null)
+        try
         {
-            CustomMessageBox.ShowInfo($"Error capturing audio: {e.Exception.Message}", "Error");
+            if (e.Exception != null)
+            {
+                CustomMessageBox.ShowInfo($"Error capturing audio: {e.Exception.Message}", "Error");
+            }
+            Stop();
         }
-        Stop();
+        catch (Exception ex)
+        {
+            Logger.LogError(ex);
+            throw;
+        }
+      
     }
 }

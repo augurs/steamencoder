@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;  
 
 namespace EncoderApp.Views
 {
@@ -30,55 +31,74 @@ namespace EncoderApp.Views
         private Rectangle[] otherAppBlocks;
         private Rectangle[] masterBlocks;
 
-        private WasapiLoopbackCapture captures;
-        private double audioInputSliderValue = 50; 
-        private double otherAppsSliderValue = 50; 
-        private bool _isMicMuted = true;
+        private double audioInputSliderValue = 50;
+        private double otherAppsSliderValue = 50;
+        private bool _isMicMuted = false;
 
         private double _previousAudioInputSliderValue = 50;
-        private bool _isOtherAppsMuted = false; 
+        private bool _isOtherAppsMuted = false;
         private bool _isMasterMuted = false;
         private DateTime _lastMicUpdate = DateTime.MinValue;
         private DateTime _lastAppUpdate = DateTime.MinValue;
+        private DateTime _lastSystemAudioUpdate = DateTime.MinValue;
 
         public MainWindow()
         {
-            InitializeComponent();
-            DataContext = this;
-     
-            _audioDevicesViewModel = (Preferences.DataContext as AudioDevicesScreenViewModel) ?? new AudioDevicesScreenViewModel();
-            _audioDevicesViewModel.PropertyChanged += AudioDevicesViewModel_PropertyChanged;
-            StartClock();
-
-            ArtistTextBox.TextChanged += (s, e) => MetaDataLoad();
-            TrackTitleTextBox.TextChanged += (s, e) => MetaDataLoad();
-            MetaDataLoad();
-            UpdateAudioDbText(audioInputSliderValue);
-            UpdateOtherAppsDbText(otherAppsSliderValue);
-            Streams.Clear();
-            AppConfigurationManager.LoadStreamsIntoCollection(Streams);
-            CreateBlocks();
-            InitAudio();
-            OtherAppAudioCaptureService.Instance.OnVolumeChanged += (level) =>
+            try
             {
-                float normalizedLevel = Math.Clamp(level / 100f, 0f, 1f);
-                Dispatcher.Invoke(() =>
-                {
-                    if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
-                    {
-                        UpdateVUMeter(OtherApplicationsVU, normalizedLevel * (float)(otherAppsSliderValue / 100.0));
-                        if (!_isMasterMuted)
-                            UpdateVUMeter(MasterVU, normalizedLevel * (float)(otherAppsSliderValue / 100.0));
-                    }
-                });
-            };
-            AudioInputCaptureService.Instance.OnError += (msg) =>
-            {
-                if (!Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
-                    CustomMessageBox.ShowInfo(msg, "Error");
-            };
+                InitializeComponent();
+                DataContext = this;
 
+                _audioDevicesViewModel = (Preferences.DataContext as AudioDevicesScreenViewModel) ?? new AudioDevicesScreenViewModel();
+                _audioDevicesViewModel.PropertyChanged += AudioDevicesViewModel_PropertyChanged;
+                StartClock();
+            
+                ArtistTextBox.TextChanged += (s, e) => MetaDataLoad();
+                TrackTitleTextBox.TextChanged += (s, e) => MetaDataLoad();
+                MetaDataLoad();
+                UpdateAudioDbText(audioInputSliderValue);
+                UpdateOtherAppsDbText(otherAppsSliderValue);
+                Streams.Clear();
+                AppConfigurationManager.LoadStreamsIntoCollection(Streams);
+                CreateBlocks();
+                InitAudio();
+                OtherAppAudioCaptureService.Instance.OnVolumeChanged += OnSystemVolumeChanged;
+                AudioInputCaptureService.Instance.OnError += OnAudioInputError;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+                throw;
+            }
         }
+
+        private void OnSystemVolumeChanged(float level)
+        {
+            if ((DateTime.Now - _lastSystemAudioUpdate).TotalMilliseconds < 50) return;
+            _lastSystemAudioUpdate = DateTime.Now;
+
+            if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+
+            float normalizedLevel = Math.Clamp(level / 100f, 0f, 1f);
+            float scaledLevel = normalizedLevel * (float)(otherAppsSliderValue / 100.0);
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
+                {
+                    UpdateVUMeter(OtherApplicationsVU, scaledLevel);
+                    if (!_isMasterMuted)
+                        UpdateVUMeter(MasterVU, scaledLevel);
+                }
+            }), DispatcherPriority.Background);  
+        }
+
+        private void OnAudioInputError(string msg)
+        {
+            if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+            Dispatcher.BeginInvoke(new Action(() => CustomMessageBox.ShowInfo(msg, "Error")), DispatcherPriority.Normal);
+        }
+
         private async void AudioDevicesViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(_audioDevicesViewModel.EnableSystemAudioCapture))
@@ -101,21 +121,22 @@ namespace EncoderApp.Views
                     }
                     catch (Exception ex)
                     {
+                        Logger.LogError(ex);
                         Debug.WriteLine($"Error in AudioDevicesViewModel_PropertyChanged: {ex.Message}");
-                        Dispatcher.Invoke(() =>
-                            CustomMessageBox.ShowInfo($"Error changing system audio capture: {ex.Message}", "Error")
-                        );
+                        if (!Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
+                            Dispatcher.BeginInvoke(new Action(() => CustomMessageBox.ShowInfo($"Error changing system audio capture: {ex.Message}", "Error")));
                     }
                 });
             }
         }
+
         #region Header
         private void Header_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 this.DragMove();
         }
-      
+
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
@@ -145,9 +166,7 @@ namespace EncoderApp.Views
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-
             this.Close();
-
         }
         #endregion
 
@@ -159,7 +178,7 @@ namespace EncoderApp.Views
                 bool isConnected = stream.IsConnected;
                 streamONText.Text = stream.Name;
                 OnAirPanel.Visibility = isConnected ? Visibility.Visible : Visibility.Collapsed;
-          
+
                 streamOFFText.Text = stream.Name;
                 OffAirPanel.Visibility = isConnected ? Visibility.Collapsed : Visibility.Visible;
                 Errorpanel.Visibility = Visibility.Collapsed;
@@ -196,20 +215,20 @@ namespace EncoderApp.Views
         }
         private void ok_click(object sender, RoutedEventArgs e)
         {
-            ApplySettings(); 
-            PreferencesModalOverlay.Visibility = Visibility.Collapsed; 
+            ApplySettings();
+            PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            PreferencesModalOverlay.Visibility = Visibility.Collapsed; 
+            PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
 
         private void Apply_click(object sender, RoutedEventArgs e)
         {
             ApplySettings();
             applyPrefencecsbtn.IsEnabled = false;
-            applyPrefencecsbtn.Opacity = 0.5; 
+            applyPrefencecsbtn.Opacity = 0.5;
         }
 
         private void ApplySettings()
@@ -230,7 +249,6 @@ namespace EncoderApp.Views
                 vm.UpdateSystemAudioCapture();
             }
         }
-
         #endregion
 
         #region BroadcastButtons
@@ -355,12 +373,11 @@ namespace EncoderApp.Views
             _isAboutDragging = false;
             (sender as UIElement).ReleaseMouseCapture();
         }
-
         #endregion
 
         private async void StartClock()
         {
-            while (true)
+            while (!Dispatcher.HasShutdownStarted)
             {
                 TimeText.Text = DateTime.Now.ToString("HH:mm:ss");
                 await Task.Delay(1000);
@@ -423,7 +440,7 @@ namespace EncoderApp.Views
         {
             PreferencesModalOverlay.Visibility = Visibility.Visible;
         }
-        private void ClosePreferences_Click(object sender, RoutedEventArgs  e)
+        private void ClosePreferences_Click(object sender, RoutedEventArgs e)
         {
             PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
@@ -445,27 +462,61 @@ namespace EncoderApp.Views
         {
             AboutModalOverlay.Visibility = Visibility.Visible;
         }
+        private void MetadataCapture_Click(object sender, RoutedEventArgs e)
+        {
+            if (MetaDataContent.Content == null)
+            {
+                var dataCaptureControl = new MetaDataCapture();
+                dataCaptureControl.CloseClicked += (s, args) =>
+                {
+                    MetaDataContent.Content = null;
+                    //  MetaDataFadeOverlay.Visibility = Visibility.Collapsed;
+                };
+                MetaDataContent.Content = dataCaptureControl;
+                //  MetaDataFadeOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MetaDataContent.Content = null;
+            }
+        }
         #endregion
 
         #region VolumeMixer
         private void UpdateAudioDbText(double sliderValue)
         {
-            if (AudioDbTextBlock != null)
+            try
             {
-                string dbText = sliderValue <= 0
-                    ? "-inf dB"
-                    : $"{Math.Max(20 * Math.Log10(sliderValue / 100.0), -80):0.0} dB";
-                AudioDbTextBlock.Text = dbText;
+                if (AudioDbTextBlock != null)
+                {
+                    string dbText = sliderValue <= 0
+                        ? "-inf dB"
+                        : $"{Math.Max(20 * Math.Log10(sliderValue / 100.0), -80):0.0} dB";
+                    AudioDbTextBlock.Text = dbText;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+                throw;
             }
         }
         private void UpdateOtherAppsDbText(double sliderValue)
         {
-            if (OtherAppsDbTextBlock != null)
+            try
             {
-                string dbText = sliderValue <= 0
-                    ? "-inf dB"
-                    : $"{Math.Max(20 * Math.Log10(sliderValue / 100.0), -80):0.0} dB";
-                OtherAppsDbTextBlock.Text = dbText;
+                if (OtherAppsDbTextBlock != null)
+                {
+                    string dbText = sliderValue <= 0
+                        ? "-inf dB"
+                        : $"{Math.Max(20 * Math.Log10(sliderValue / 100.0), -80):0.0} dB";
+                    OtherAppsDbTextBlock.Text = dbText;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+                throw;
             }
         }
         private void AudioToggle_Click(object sender, MouseButtonEventArgs e)
@@ -481,7 +532,6 @@ namespace EncoderApp.Views
                     AudioInputCaptureService.Instance.Stop();
                     _previousAudioInputSliderValue = AudioSlider.Value;
                     AudioSlider.Value = 0;
-                    captures?.StopRecording();
                 }
                 else
                 {
@@ -493,9 +543,9 @@ namespace EncoderApp.Views
                     InitAudio();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Logger.LogError(ex);
                 throw;
             }
         }
@@ -511,13 +561,14 @@ namespace EncoderApp.Views
             }
             catch (Exception ex)
             {
-                CustomMessageBox.ShowInfo( $"Failed to load speaker icon: {ex.Message}", "Error" );
+                Logger.LogError(ex);
+                CustomMessageBox.ShowInfo($"Failed to load speaker icon: {ex.Message}", "Error");
             }
 
             if (_isOtherAppsMuted)
             {
                 OtherAppsSlider.Value = 0;
-                
+
                 OtherAppAudioCaptureService.Instance.Stop();
                 UpdateVUMeter(OtherApplicationsVU, 0);
                 if (!_isMasterMuted)
@@ -544,34 +595,34 @@ namespace EncoderApp.Views
             }
             catch (Exception ex)
             {
+                Logger.LogError(ex);
                 CustomMessageBox.ShowInfo($"Failed to load speaker icon: {ex.Message}", "Error");
             }
 
-            await Task.Run(async () =>
+            // UI updates on main thread
+            if (_isMasterMuted)
+            {
+                AudioSlider.Value = 0;
+                AudioSlider.IsEnabled = false;
+                OtherAppsSlider.Value = 0;
+                OtherAppsSlider.IsEnabled = false;
+                UpdateVUMeter(AudioInputVU, 0);
+                UpdateVUMeter(OtherApplicationsVU, 0);
+                UpdateVUMeter(MasterVU, 0);
+            }
+            else
+            {
+                AudioSlider.Value = 50;
+                AudioSlider.IsEnabled = true;
+                OtherAppsSlider.Value = 50;
+                OtherAppsSlider.IsEnabled = true;
+            }
+
+            // Background for heavy ops
+            _ = Task.Run(() =>
             {
                 try
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (_isMasterMuted)
-                        {
-                            AudioSlider.Value = 0;
-                            AudioSlider.IsEnabled = false;
-                            OtherAppsSlider.Value = 0;
-                            OtherAppsSlider.IsEnabled = false;
-                            UpdateVUMeter(AudioInputVU, 0);
-                            UpdateVUMeter(OtherApplicationsVU, 0);
-                            UpdateVUMeter(MasterVU, 0);
-                        }
-                        else
-                        {
-                            AudioSlider.Value = 50;
-                            AudioSlider.IsEnabled = true;
-                            OtherAppsSlider.Value = 50;
-                            OtherAppsSlider.IsEnabled = true;
-                        }
-                    });
-
                     if (_isMasterMuted)
                     {
                         OtherAppAudioCaptureService.Instance.Stop();
@@ -579,19 +630,19 @@ namespace EncoderApp.Views
                     }
                     else
                     {
-                        if (!_isMicMuted)
-                            InitAudio();
+                        if (!_isMicMuted && _audioDevicesViewModel.EnableInputAudio)
+                            AudioInputCaptureService.Instance.Start();
                         if (!_isOtherAppsMuted && _audioDevicesViewModel.EnableSystemAudioCapture)
                             OtherAppAudioCaptureService.Instance.Start();
                         if (!_isMicMuted && _audioDevicesViewModel.EnableInputAudio)
-                            AudioInputCaptureService.Instance.Start();
+                            InitAudio();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Dispatcher.Invoke(() =>
-                        CustomMessageBox.ShowInfo($"Error in MasterToggle_Click: {ex.Message}", "Error")
-                    );
+                    Logger.LogError(ex);
+                    if (!Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
+                        Dispatcher.BeginInvoke(new Action(() => CustomMessageBox.ShowInfo($"Error in MasterToggle_Click: {ex.Message}", "Error")));
                 }
             });
         }
@@ -663,33 +714,33 @@ namespace EncoderApp.Views
                 audioInputBlocks[i] = new Rectangle
                 {
                     Width = 40,
-                    Height = 20,   
+                    Height = 20,
                     Margin = new Thickness(0, 0, 0, 0),
                     Fill = Brushes.Transparent,
                     Stroke = Brushes.Transparent,
                     StrokeThickness = 0,
                     RenderTransform = new ScaleTransform(1, 1),
-                    RenderTransformOrigin = new Point(0.5, 1) 
+                    RenderTransformOrigin = new Point(0.5, 1)
                 };
                 AudioInputVU.Children.Insert(0, audioInputBlocks[i]);
 
                 otherAppBlocks[i] = new Rectangle
                 {
                     Width = 40,
-                    Height = 20,   
+                    Height = 20,
                     Margin = new Thickness(0, 0, 0, 0),
                     Fill = Brushes.Transparent,
                     Stroke = Brushes.Transparent,
                     StrokeThickness = 0,
                     RenderTransform = new ScaleTransform(1, 1),
-                    RenderTransformOrigin = new Point(0.5, 1) 
+                    RenderTransformOrigin = new Point(0.5, 1)
                 };
                 OtherApplicationsVU.Children.Insert(0, otherAppBlocks[i]);
 
                 masterBlocks[i] = new Rectangle
                 {
                     Width = 40,
-                    Height = 20,   
+                    Height = 20,
                     Margin = new Thickness(0, 0, 0, 0),
                     Fill = Brushes.Transparent,
                     Stroke = Brushes.Transparent,
@@ -727,17 +778,16 @@ namespace EncoderApp.Views
                 if (isActive)
                 {
                     scaleTransform.ScaleY = 1;
-                    rectangle.Fill = Brushes.LimeGreen;   
+                    rectangle.Fill = Brushes.LimeGreen;
                 }
                 else
                 {
-                    scaleTransform.ScaleY = 1;           
-                    rectangle.Fill = Brushes.Transparent; 
+                    scaleTransform.ScaleY = 1;
+                    rectangle.Fill = Brushes.Transparent;
                 }
             }
         }
         private WaveInEvent micCapture;
-        private WasapiLoopbackCapture appCapture;
 
         private void InitAudio()
         {
@@ -761,12 +811,13 @@ namespace EncoderApp.Views
             }
             catch (Exception ex)
             {
-                //CustomMessageBox.ShowInfo($"Error starting audio:  {ex.Message}", "Error");
+                Logger.LogError(ex);
             }
         }
 
         private void Mic_DataAvailable(object sender, WaveInEventArgs e)
         {
+            if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
             var audioInputOkay = AppConfigurationManager.ReadValue("AudioInput");
 
             if (_isMicMuted || audioInputOkay != "Yes") return;
@@ -774,80 +825,51 @@ namespace EncoderApp.Views
             if ((DateTime.Now - _lastMicUpdate).TotalMilliseconds < 50) return;
             _lastMicUpdate = DateTime.Now;
 
-
             float max = 0;
-            for (int index = 0; index < e.BytesRecorded; index += 2)
+           
+            int step = 4; 
+            for (int index = 0; index < e.BytesRecorded; index += 2 * step)
             {
+                if (index >= e.BytesRecorded - 1) break;
                 short sample = BitConverter.ToInt16(e.Buffer, index);
                 float sample32 = Math.Abs(sample / 32768f);
                 if (sample32 > max)
                     max = sample32;
             }
 
-            Dispatcher.Invoke(() =>
+            float scaledMax = max * (float)(audioInputSliderValue / 100.0);
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                UpdateVUMeter(AudioInputVU, max * (float)(audioInputSliderValue / 100.0));
+                UpdateVUMeter(AudioInputVU, scaledMax);
                 if (!_isMasterMuted)
-                    UpdateVUMeter(MasterVU, max * (float)(audioInputSliderValue / 100.0));
-            });
-
-        }
-        private void App_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
-        {
-            var InputOkay = AppConfigurationManager.ReadValue("OthersApplicationInput");
-            if (_isOtherAppsMuted || InputOkay != "Yes") return;
-
-            if ((DateTime.Now - _lastAppUpdate).TotalMilliseconds < 50) return;
-            _lastAppUpdate = DateTime.Now;
-
-            float max = 0;
-            for (int index = 0; index < e.BytesRecorded; index += 4)
-            {
-                short sampleLeft = BitConverter.ToInt16(e.Buffer, index);
-                short sampleRight = BitConverter.ToInt16(e.Buffer, index + 2);
-                float sample32 = Math.Max(Math.Abs(sampleLeft / 32768f), Math.Abs(sampleRight / 32768f));
-                if (sample32 > max) max = sample32;
-            }
-
-            float scaledLevel = max * (float)(otherAppsSliderValue / 100.0);
-
-            if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
-
-            Dispatcher.Invoke(() =>
-            {
-                UpdateVUMeter(OtherApplicationsVU, scaledLevel);
-                if (!_isMasterMuted)
-                    UpdateVUMeter(MasterVU, scaledLevel);
-            });
+                    UpdateVUMeter(MasterVU, scaledMax);
+            }), DispatcherPriority.Background);
         }
 
-        protected override void OnClosed(EventArgs e)
+        protected override async void OnClosed(EventArgs e)
         {
             _audioDevicesViewModel.PropertyChanged -= AudioDevicesViewModel_PropertyChanged;
 
             try { OtherAppAudioCaptureService.Instance.Stop(); }
-            catch (Exception ex) { /*Debug.WriteLine($"Stop other apps audio error: {ex.Message}");*/ }
+            catch (Exception ex) { Logger.LogError(ex); }
 
             try { AudioInputCaptureService.Instance.Stop(); }
-            catch (Exception ex) { /*Debug.WriteLine($"Stop mic audio error: {ex.Message}");*/ }
+            catch (Exception ex) { Logger.LogError(ex); }
 
             try
             {
                 micCapture?.StopRecording();
+                await Task.Delay(100);  
                 micCapture?.Dispose();
-               
                 micCapture = null;
             }
-            catch (Exception ex) 
-            { 
-                //CustomMessageBox.ShowInfo($"Dispose mic capture error: {ex.Message}","Error"); 
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
             }
 
             base.OnClosed(e);
-         
         }
-
-
         #endregion
     }
 }

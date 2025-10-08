@@ -247,12 +247,12 @@
             <DockPanel Grid.Row="0" Margin="0,0,0,0" Background="#131d2f">
                 <Menu DockPanel.Dock="Top" VerticalAlignment="Center" Foreground="#94a3b8" Background="#131d2f">
                     <MenuItem Header="File" Height="20" >
-                        <MenuItem Header="Broadcast Wizard" InputGestureText="Ctrl+N" />
+                        <MenuItem Header="Broadcast Wizard"  />
                         <Separator Background="#071024"/>
                         <MenuItem Header="New Broadcast Project" />
-                        <MenuItem Header="Open Broadcast Project" InputGestureText="Ctrl+O" />
+                        <MenuItem Header="Open Broadcast Project" />
                         <Separator  Background="#071024"/>
-                        <MenuItem Header="Save Broadcast Project" InputGestureText="Ctrl+S"/>
+                        <MenuItem Header="Save Broadcast Project" />
                         <MenuItem Header="Save Broadcast Project As"/>
                         <Separator  Background="#071024"/>
                         <MenuItem Header="Recent Broadcast Projects">
@@ -263,7 +263,7 @@
                     </MenuItem>
                     <MenuItem Header="Broadcast">
                         <MenuItem Header="Streams" Click="Streams_Click"/>
-                        <MenuItem Header="Metadata Capture"/>
+                        <MenuItem Header="Metadata Capture" Click="MetadataCapture_Click"/>
                         <Separator  Background="#071024"/>
                         <MenuItem Header="Start Broadcast">
                             <MenuItem.Icon>
@@ -558,9 +558,9 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock x:Name="AudioDbTextBlock" Text="0 dB" FontSize="14" VerticalAlignment="Center"
                                                    Foreground="Gray" Margin="5,0,0,0" Grid.Column="0"/>
-                                        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Padding="5"
-                                                VerticalAlignment="Center" Margin="0,0,7,0" MouseLeftButtonDown="AudioToggle_Click">
-                                            <Image x:Name="AudioToggleImage" Source="/Images/DisableSpeaker.png"
+                                        <Border Grid.Column="1" BorderBrush="LightGray" Cursor="Hand" MouseLeftButtonDown="AudioToggle_Click" BorderThickness="1" CornerRadius="4" Padding="5"
+                                                VerticalAlignment="Center" Margin="0,0,7,0" >
+                                            <Image x:Name="AudioToggleImage"  Source="/Images/EnableSpeaker.png"
                                                    Width="20" Height="20" VerticalAlignment="Center"/>
                                         </Border>
                                     </Grid>
@@ -587,8 +587,8 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock x:Name="OtherAppsDbTextBlock" Text="0 dB" FontSize="14" VerticalAlignment="Center" 
                                                    Foreground="Gray" Margin="5,0,0,0" Grid.Column="0"/>
-                                        <Border Grid.Column="1" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Padding="5"
-                                                VerticalAlignment="Center" Margin="0,0,7,0" MouseLeftButtonDown="OtherAppsToggle_Click">
+                                        <Border Grid.Column="1" BorderBrush="LightGray" Cursor="Hand" MouseLeftButtonDown="OtherAppsToggle_Click" BorderThickness="1" CornerRadius="4" Padding="5"
+                                                VerticalAlignment="Center" Margin="0,0,7,0" >
                                             <Image x:Name="OtherAppsToggleImage" Source="/Images/EnableSpeaker.png" Width="20" Height="20" VerticalAlignment="Center"/>
                                         </Border>
                                     </Grid>
@@ -730,6 +730,9 @@
                 </Grid>
             </Border>
         </Grid>
-
+        <!--<Grid x:Name="MetaDataFadeOverlay" Background="#B2000000" Visibility="Collapsed">
+     
+  </Grid>-->
+        <ContentControl x:Name="MetaDataContent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </Window>
