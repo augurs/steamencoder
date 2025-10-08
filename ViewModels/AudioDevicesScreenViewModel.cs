@@ -411,9 +411,18 @@ namespace EncoderApp.ViewModels
                 try
                 {
                     if (EnableSystemAudioCapture)
+                    {
                         await Task.Run(() => OtherAppAudioCaptureService.Instance.Start(_selectedDeviceIndex));
+                    }
                     else
+                    {
                         OtherAppAudioCaptureService.Instance.Stop();
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (Application.Current.MainWindow is MainWindow mainWindow)
+                                mainWindow.UpdateVUMeter(mainWindow.OtherApplicationsVU, 0);
+                        }));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -472,9 +481,18 @@ namespace EncoderApp.ViewModels
                 try
                 {
                     if (EnableInputAudio)
+                    {
                         AudioInputCaptureService.Instance.Start(_selectedDeviceIndex, SelectedAudioApi);
+                    }
                     else
+                    {
                         AudioInputCaptureService.Instance.Stop();
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (Application.Current.MainWindow is MainWindow mainWindow)
+                                mainWindow.UpdateVUMeter(mainWindow.AudioInputVU, 0);
+                        }));
+                    }
                 }
                 catch (Exception ex)
                 {

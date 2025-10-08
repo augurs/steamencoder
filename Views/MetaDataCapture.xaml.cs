@@ -1,7 +1,9 @@
-﻿using System;
+﻿using EncoderApp.Models;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace EncoderApp.Views
 {
@@ -12,9 +14,11 @@ namespace EncoderApp.Views
     {
         public event RoutedEventHandler CloseClicked;
         public event RoutedEventHandler OkClicked;
+        public event RoutedEventHandler CancelClicked;
         public MetaDataCapture()
         {
             InitializeComponent();
+
         }
         private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -52,22 +56,68 @@ namespace EncoderApp.Views
             }
 
         }
-        //private void ModalHeader_MouseDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    // Only respond to left mouse button
-        //    if (e.LeftButton == MouseButtonState.Pressed)
-        //    {
-        //        // Move the parent window
-        //        Window parentWindow = Window.GetWindow(this);
-        //        parentWindow?.DragMove();
-        //    }
-        //}
+        private Point _startMousePosition;
+        private TranslateTransform _transform = new TranslateTransform();
+        private bool _isDragging = false;
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private void ModalHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OkClicked?.Invoke(this, e);
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                _isDragging = true;
+                _startMousePosition = e.GetPosition(null); 
+                (sender as UIElement).CaptureMouse();
+            }
+        }
+
+        private void ModalHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isDragging)
+            {
+                Point currentMousePosition = e.GetPosition(null); 
+                Vector delta = currentMousePosition - _startMousePosition;
+
+                RootTransform.X += delta.X;
+                RootTransform.Y += delta.Y;
+
+                _startMousePosition = currentMousePosition;
+            }
+        }
+
+        private void ModalHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isDragging = false;
+            (sender as UIElement).ReleaseMouseCapture();
         }
 
 
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CloseClicked?.Invoke(this, e);
+                this.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+                throw;
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CloseClicked?.Invoke(this, e);
+                this.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+                throw;
+            }
+  
+        }
     }
 }

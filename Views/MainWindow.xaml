@@ -589,7 +589,7 @@
                                                    Foreground="Gray" Margin="5,0,0,0" Grid.Column="0"/>
                                         <Border Grid.Column="1" BorderBrush="LightGray" Cursor="Hand" BorderThickness="1" CornerRadius="4" Padding="5"
                                                 VerticalAlignment="Center" Margin="0,0,7,0" >
-                                            <Image x:Name="OtherAppsToggleImage"  MouseLeftButtonDown="OtherAppsToggle_Click"  Source="/Images/EnableSpeaker.png" Width="20" Height="20" VerticalAlignment="Center"/>
+                                            <Image x:Name="OtherAppsToggleImage" MouseLeftButtonDown="OtherAppsToggle_Click" Source="/Images/EnableSpeaker.png" Width="20" Height="20" VerticalAlignment="Center"/>
                                         </Border>
                                     </Grid>
                                 </StackPanel>

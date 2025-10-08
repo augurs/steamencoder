@@ -11,7 +11,12 @@
         </LinearGradientBrush>
     </UserControl.Background>
 
+    <UserControl.RenderTransform>
+        <TranslateTransform x:Name="RootTransform"/>
+    </UserControl.RenderTransform>
+
     <UserControl.Resources>
+        <!-- TabItem Styles -->
         <Style x:Key="ModernTabItemStyle" TargetType="TabItem">
             <Setter Property="Foreground" Value="#94a3b8"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -44,43 +49,41 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <Style x:Key="CustomTabItemStyle" TargetType="TabItem">
             <Setter Property="Foreground" Value="#94a3b8"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Padding" Value="9,0,8,0"/>
-            <Setter Property="FontFamily" Value="pack://application:,,,/Font/#Urbanist"/>
+            <Setter Property="Padding" Value="11,0,10,0"/>
+   
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="MinHeight" Value="22"/>
             <Setter Property="Height" Value="28"/>
-            <Setter Property="Margin" Value="0,0,0.5,0"/>
+            <Setter Property="Margin" Value="-3,0,-1.9,0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                        <Border
-                                x:Name="TabBorder"
+                        <Border x:Name="TabBorder"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="4,4,0,0"        
+                                CornerRadius="4,4,0,0"
                                 Padding="{TemplateBinding Padding}"
                                 BorderThickness="1,1,0.5,1"
                                 BorderBrush="#212a3b"
                                 SnapsToDevicePixels="True">
-                            <ContentPresenter
-                                            x:Name="ContentSite"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center"
-                                            ContentSource="Header"
-                                            RecognizesAccessKey="True" />
+                            <ContentPresenter x:Name="ContentSite"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True" />
                         </Border>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="#1e293b"/>
+                                <Setter TargetName="TabBorder" Property="Background" Value="#3498db"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="#3498db"/>
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#3498db"/>
+                                <Setter TargetName="TabBorder" Property="Background" Value="#131d2f"/>
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#131d2f"/>
                                 <Setter Property="Foreground" Value="White"/>
                                 <Setter Property="Height" Value="30"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
@@ -94,6 +97,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- ComboBox Styles -->
         <Style x:Key="ComboBoxStyle" TargetType="ComboBox">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="OverridesDefaultStyle" Value="True"/>
@@ -191,9 +196,8 @@
                                           MinWidth="{TemplateBinding ActualWidth}"
                                           SnapsToDevicePixels="True"
                                           Background="#445370"
-                                          Margin="0,1,0,0" Width="200" >
-                                        <Border BorderThickness="1"
-                                                Background="#131d2f"/>
+                                          Margin="0,1,0,0">
+                                        <Border BorderThickness="1" Background="#131d2f"/>
                                         <StackPanel IsItemsHost="True"/>
                                     </Grid>
                                 </Popup>
@@ -216,6 +220,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- ComboBoxItem -->
         <Style TargetType="ComboBoxItem" x:Key="CleanComboBoxItem">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#94a3b8"/>
@@ -244,6 +250,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Buttons -->
         <Style x:Key="DarkButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#3498db"/>
             <Setter Property="Foreground" Value="White"/>
@@ -256,9 +264,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border"
-                           Background="{TemplateBinding Background}" 
-                           BorderBrush="{TemplateBinding BorderBrush}" 
-                           CornerRadius="3">
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                CornerRadius="3">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -277,59 +285,66 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <Style x:Key="DarkCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource DarkButtonStyle}">
             <Setter Property="Background" Value="#212a3b"/>
             <Setter Property="Foreground" Value="#94a3b8"/>
         </Style>
     </UserControl.Resources>
-    <Grid>
-        <local:ModalHeader 
-    Title="MetaData Capture" 
-    VerticalAlignment="Top"
-    CloseClicked="Header_CloseClicked"
-/>
 
-        <Grid Margin="10,29,10,10">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <!-- Header -->
+            <RowDefinition Height="*"/>
+            <!-- Content -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <local:ModalHeader Grid.Row="0"
+                           Title="MetaData Capture"
+                           CloseClicked="Header_CloseClicked"
+                           MouseLeftButtonDown="ModalHeader_MouseLeftButtonDown"
+                           MouseMove="ModalHeader_MouseMove"
+                           MouseLeftButtonUp="ModalHeader_MouseLeftButtonUp"/>
+
+        <!-- Content -->
+        <Grid Grid.Row="1" Margin="10,5,10,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" Background="#131d2f" BorderBrush="#212a3b" BorderThickness="1.5" CornerRadius="6" Padding="10" Margin="0,10,0,0">
-                <StackPanel  Grid.Row="0">
-                    <TabControl Background="#131d2f" BorderBrush="#212a3b" BorderThickness="0" Foreground="#94a3b8">
-                        <TabControl.ItemContainerStyle>
-                            <StaticResource ResourceKey="ModernTabItemStyle"/>
-                        </TabControl.ItemContainerStyle>
-                        <TabItem Header="Window Title" Style="{StaticResource CustomTabItemStyle}">
-                            <StackPanel Margin="0,10,0,10">
+
+            <!--<Border Grid.Row="0" Background="#131d2f" BorderBrush="#212a3b" BorderThickness="1.5" CornerRadius="6" Padding="10" Margin="0,5,0,0">-->
+            <Grid Grid.Row="0">
+                <TabControl Background="#131d2f" BorderBrush="#212a3b" BorderThickness="0" Foreground="#94a3b8">
+                    <TabControl.ItemContainerStyle>
+                        <StaticResource ResourceKey="ModernTabItemStyle"/>
+                    </TabControl.ItemContainerStyle>
+
+                    <!-- Tabs -->
+                    <TabItem Header="Window Title" Style="{StaticResource CustomTabItemStyle}" Margin="-2,0,4,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10,10,10,10">
                                 <CheckBox Content="Capture metadata from the title of another application window"
-                                      Foreground="#3498db" Margin="0,0,0,10" FontSize="15" FontWeight="SemiBold"/>
+                              Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
                                 <TextBlock Text="Step 1. Choose an app window to capture metadata from:" Foreground="#94a3b8"/>
                                 <StackPanel Orientation="Horizontal" Margin="5,10,5,5">
                                     <TextBlock Text="Application Window" VerticalAlignment="Center" Foreground="#94a3b8" HorizontalAlignment="Left"/>
                                     <ComboBox Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" 
-                                          Margin="15,5,0,5" Height="30" Background="#0b1220" Foreground="#94a3b8" Width="468" />
+                                  Margin="15,5,0,5" Height="30" Background="#0b1220" Foreground="#94a3b8" Width="468"/>
                                 </StackPanel>
                                 <DockPanel Margin="0,0,0,5" LastChildFill="True">
-                                    <Button Style="{StaticResource DarkButtonStyle}" Content="Refresh List" 
-                                        Width="100" Height="28"
-                                        DockPanel.Dock="Left" 
-                                        Margin="0,0,10,0"/>
-                                    <CheckBox Content="Only list windows making sound" 
-                                          Foreground="#94a3b8" 
-                                          HorizontalAlignment="Right" 
-                                          VerticalAlignment="Center" FontWeight="ExtraLight" FontSize="13"/>
+                                    <Button Style="{StaticResource DarkButtonStyle}" Content="Refresh List" Width="100" Height="28" DockPanel.Dock="Left" Margin="0,0,10,0"/>
+                                    <CheckBox Content="Only list windows making sound" Foreground="#94a3b8" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="ExtraLight" FontSize="13"/>
                                 </DockPanel>
                                 <Border Height="1.5" Background="#212a3b" Margin="0,5,0,2"/>
-
-
                                 <TextBlock Text="Step 2. Choose the format that matches the window title:" Margin="0,10,0,5" Foreground="#94a3b8"/>
                                 <StackPanel Margin="4,0,0,0">
                                     <RadioButton FontWeight="Normal" Content="Artist - Title - Window Title"  Foreground="#94a3b8" IsChecked="True"/>
                                     <RadioButton FontWeight="Normal" Content="Window Title - Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"/>
                                     <RadioButton FontWeight="Normal" Content="Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"/>
                                     <RadioButton FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"/>
-
                                 </StackPanel>
                                 <TextBox Height="25" Text="%artist% - %title% - %appname%" Padding="5,4,0,0" Margin="0,10,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220"  IsEnabled="True">
                                     <TextBox.Resources>
@@ -338,42 +353,48 @@
                                         </Style>
                                     </TextBox.Resources>
                                 </TextBox>
-                                <TextBlock  Text="Preview:" Margin="0,10,0,2" Foreground="#94a3b8"/>
+                                <TextBlock Text="Preview:" Margin="0,10,0,2" Foreground="#94a3b8"/>
                                 <StackPanel Margin="0,0,0,0">
                                     <TextBlock Text="Artist :" Foreground="#94a3b8" FontWeight="Normal"/>
                                     <TextBlock Text="Title:" Margin="0,5,0,0" Foreground="#94a3b8" FontWeight="Normal"/>
                                 </StackPanel>
                             </StackPanel>
-                        </TabItem>
+                        </ScrollViewer>
+                    </TabItem>
 
-                        <TabItem Header="TCP Server" Style="{StaticResource CustomTabItemStyle}">
-                            <TextBlock Text="TCP Server settings go here" Foreground="#94a3b8" Margin="10"/>
-                        </TabItem>
+                    <!-- Other TabItems -->
+                    <TabItem Header="TCP Server" Style="{StaticResource CustomTabItemStyle}"  Padding="0" Margin="-5,0,-3,0">
+                        <TextBlock Text="TCP Server settings go here" Foreground="#94a3b8" Margin="10"/>
+                    </TabItem>
 
-                        <TabItem Header="TCP Client" Style="{StaticResource CustomTabItemStyle}">
-                            <TextBlock Text="TCP Client settings go here" Foreground="#94a3b8" Margin="10"/>
-                        </TabItem>
+                    <TabItem Header="TCP Client" Style="{StaticResource CustomTabItemStyle}" Margin="3,0,-5,0">
+                        <TextBlock Text="TCP Client settings go here" Foreground="#94a3b8" Margin="10"/>
+                    </TabItem>
 
-                        <TabItem Header="UDP Server" Style="{StaticResource CustomTabItemStyle}">
-                            <TextBlock Text="UDP Server settings go here" Foreground="#94a3b8" Margin="10"/>
-                        </TabItem>
+                    <TabItem Header="UDP Server" Style="{StaticResource CustomTabItemStyle}" Margin="5,0,-10,0">
+                        <TextBlock Text="UDP Server settings go here" Foreground="#94a3b8" Margin="10"/>
+                    </TabItem>
 
-                        <TabItem Header="Text File" Style="{StaticResource CustomTabItemStyle}">
-                            <TextBlock Text="Text File settings go here" Foreground="#94a3b8" Margin="10"/>
-                        </TabItem>
+                    <TabItem Header="Text File" Style="{StaticResource CustomTabItemStyle}" Margin="10,0,-15,0">
+                        <TextBlock Text="Text File settings go here" Foreground="#94a3b8" Margin="10"/>
+                    </TabItem>
 
-                        <TabItem Header="Metadata Processor" Style="{StaticResource CustomTabItemStyle}">
-                            <TextBlock Text="Metadata Processor settings go here" Foreground="#94a3b8" Margin="10"/>
-                        </TabItem>
-                        <TabItem Header="Output Format" Style="{StaticResource CustomTabItemStyle}">
-                            <TextBlock Text="Output Format settings go here" Margin="10"/>
-                        </TabItem>
-                    </TabControl>
-                </StackPanel>
-            </Border>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,10,0,0">
-                <Button Content="OK"  Click="OkButton_Click" Style="{StaticResource DarkButtonStyle}" Width="80" Height="30" Margin="5" Background="#3498db" Foreground="White"/>
-                <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Width="80" Height="30" Margin="5" Background="#555" Foreground="White"/>
+                    <TabItem Header="Metadata Processor" Style="{StaticResource CustomTabItemStyle}" Margin="15,0,-20,0">
+                        <TextBlock Text="Metadata Processor settings go here" Foreground="#94a3b8" Margin="10"/>
+                    </TabItem>
+
+                    <TabItem Header="Output Format" Style="{StaticResource CustomTabItemStyle}" Margin="19,0,-24,0">
+                        <TextBlock Text="Output Format settings go here" Margin="10"/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <!--</Border>-->
+
+            <!-- Bottom Buttons -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Style="{StaticResource DarkButtonStyle}" Content="OK" Width="80" Margin="0,0,10,0" Click="OkButton_Click"/>
+                <Button Style="{StaticResource DarkCancelButtonStyle}" Content="Cancel" Width="80" Click="Cancel_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

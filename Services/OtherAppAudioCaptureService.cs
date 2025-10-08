@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using EncoderApp.Views;
+using NAudio.Wave;
 using System;
 using System.Windows;
 

@@ -64,6 +64,7 @@ namespace EncoderApp.Views
                 InitAudio();
                 OtherAppAudioCaptureService.Instance.OnVolumeChanged += OnSystemVolumeChanged;
                 AudioInputCaptureService.Instance.OnError += OnAudioInputError;
+             
             }
             catch (Exception ex)
             {
@@ -217,6 +218,8 @@ namespace EncoderApp.Views
         {
             ApplySettings();
             PreferencesModalOverlay.Visibility = Visibility.Collapsed;
+            applyPrefencecsbtn.IsEnabled = true;
+            applyPrefencecsbtn.Opacity = 1;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -480,9 +483,11 @@ namespace EncoderApp.Views
                 MetaDataContent.Content = null;
             }
         }
+      
         #endregion
 
         #region VolumeMixer
+
         private void UpdateAudioDbText(double sliderValue)
         {
             try
@@ -532,6 +537,10 @@ namespace EncoderApp.Views
                     AudioInputCaptureService.Instance.Stop();
                     _previousAudioInputSliderValue = AudioSlider.Value;
                     AudioSlider.Value = 0;
+                    UpdateVUMeter(MasterVU, 0);
+                    AudioToggleImage.Source = new BitmapImage(new Uri(
+                         "/Images/muteSpeaker_Icon.png",
+                         UriKind.Relative));
                 }
                 else
                 {
@@ -672,9 +681,13 @@ namespace EncoderApp.Views
                     AudioToggleImage.Source = new BitmapImage(new Uri(
                         "/Images/EnableSpeaker.png",
                         UriKind.Relative));
+                  
                 }
+             
             }
         }
+       
+
         private void OtherAppsSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var slider = sender as Slider;
@@ -701,6 +714,28 @@ namespace EncoderApp.Views
                 {
                     OtherAppsToggleImage.Source = new BitmapImage(new Uri("/Images/EnableSpeaker.png", UriKind.Relative));
                 }
+            }
+        }
+        private void UpdateMasterVU()
+        {
+            try
+            {
+                if (_isMasterMuted || (_isMicMuted && _isOtherAppsMuted) || (AudioSlider.Value <= 0 && OtherAppsSlider.Value <= 0))
+                {
+                    UpdateVUMeter(MasterVU, 0);
+                }
+                else
+                {
+                    // Calculate combined level (e.g., maximum of the two inputs)
+                    float audioLevel = (float)(AudioSlider.Value / 100.0);
+                    float otherAppsLevel = (float)(OtherAppsSlider.Value / 100.0);
+                    float combinedLevel = Math.Max(audioLevel, otherAppsLevel * 0.7f); // Scale other apps as in OtherAppsSlider_ValueChanged
+                    UpdateVUMeter(MasterVU, combinedLevel);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
             }
         }
         private void CreateBlocks()
@@ -751,7 +786,7 @@ namespace EncoderApp.Views
                 MasterVU.Children.Insert(0, masterBlocks[i]);
             }
         }
-        private void UpdateVUMeter(StackPanel vuPanel, float level)
+        public void UpdateVUMeter(StackPanel vuPanel, float level)
         {
             if (vuPanel == null)
             {
