@@ -2,19 +2,16 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:EncoderApp.Views"
-             Height="550" Width="671">
-
+             Height="550" Width="671" >
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#071024" Offset="0"/>
             <GradientStop Color="#06122b" Offset="1"/>
         </LinearGradientBrush>
     </UserControl.Background>
-
     <UserControl.RenderTransform>
         <TranslateTransform x:Name="RootTransform"/>
     </UserControl.RenderTransform>
-
     <UserControl.Resources>
         <Style x:Key="ModernTabItemStyle" TargetType="TabItem">
             <Setter Property="Foreground" Value="#94a3b8"/>
@@ -48,12 +45,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style x:Key="CustomTabItemStyle" TargetType="TabItem">
             <Setter Property="Foreground" Value="#94a3b8"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Padding" Value="11,0,10,0"/>
-
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="MinHeight" Value="22"/>
@@ -287,7 +282,6 @@
             <Setter Property="Foreground" Value="#94a3b8"/>
         </Style>
     </UserControl.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -299,7 +293,6 @@
                            MouseLeftButtonDown="ModalHeader_MouseLeftButtonDown"
                            MouseMove="ModalHeader_MouseMove"
                            MouseLeftButtonUp="ModalHeader_MouseLeftButtonUp"/>
-
         <Grid Grid.Row="1" Margin="10,5,10,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -313,13 +306,13 @@
                     <TabItem Header="Window Title" Style="{StaticResource CustomTabItemStyle}"  Margin="-2,0,-3,0">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="10,10,10,10">
-                                <CheckBox Content="Capture metadata from the title of another application window"
-                              Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
+                                <CheckBox Content="Customize the formatting of the song metadata sent to your streams : "
+                                            Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
                                 <TextBlock Text="Step 1. Choose an app window to capture metadata from:" Foreground="#94a3b8"/>
                                 <StackPanel Orientation="Horizontal" Margin="5,10,5,5">
                                     <TextBlock Text="Application Window" VerticalAlignment="Center" Foreground="#94a3b8" HorizontalAlignment="Left"/>
                                     <ComboBox Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" 
-                                  Margin="15,5,0,5" Height="30" Background="#0b1220" Foreground="#94a3b8" Width="492"/>
+                                                Margin="15,5,0,5" Height="30" Background="#0b1220" Foreground="#94a3b8" Width="492"/>
                                 </StackPanel>
                                 <DockPanel Margin="0,0,0,5" LastChildFill="True">
                                     <Button Style="{StaticResource DarkButtonStyle}" Content="Refresh List" Width="100" Height="28" DockPanel.Dock="Left" Margin="0,0,10,0"/>
@@ -328,7 +321,7 @@
                                 <Border Height="1.5" Background="#212a3b" Margin="0,5,0,2"/>
                                 <TextBlock Text="Step 2. Choose the format that matches the window title:" Margin="0,10,0,5" Foreground="#94a3b8"/>
                                 <StackPanel Margin="4,0,0,0">
-                                    <RadioButton FontWeight="Normal" Content="Artist - Title - Window Title"  Foreground="#94a3b8" IsChecked="True"/>
+                                    <RadioButton FontWeight="Normal" Content="Artist - Title - Window Title" Foreground="#94a3b8" IsChecked="True"/>
                                     <RadioButton FontWeight="Normal" Content="Window Title - Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"/>
                                     <RadioButton FontWeight="Normal" Content="Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"/>
                                     <RadioButton FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"/>
@@ -497,7 +490,6 @@
                                                Foreground="#3498db"
                                                FontSize="12"
                                                Margin="0,0,0,10"/>
-
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -535,9 +527,6 @@
                                                 <RepeatButton Content="▼" Height="12" FontSize="8" />
                                             </StackPanel>
                                         </Grid>
-
-
-
                                     </Grid>
                                     <TextBlock Text="Stream Encoder will conncect as a TCP client to the TCP server configured above" Grid.Row="2" Foreground="#94a3b8" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                 </StackPanel>
@@ -565,11 +554,7 @@
                                                     Height="30"
                                                     Style="{StaticResource ComboBoxStyle}"
                                                     ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                                    SelectedIndex="0" Grid.ColumnSpan="2">
-                                            <ComboBoxItem Content="MP3"/>
-                                            <ComboBoxItem Content="WAV"/>
-                                            <ComboBoxItem Content="FLAC"/>
-                                        </ComboBox>
+                                                    SelectedIndex="0" Grid.ColumnSpan="2"/>
                                         <TextBlock Text="Character Encoding:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8"  Grid.RowSpan="2"/>
                                         <ComboBox
                                                 Grid.Row="1" Grid.Column="1" 
@@ -579,11 +564,7 @@
                                                 Height="30"
                                                 Style="{StaticResource ComboBoxStyle}"
                                                 ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                                SelectedIndex="0" Grid.RowSpan="2">
-                                            <ComboBoxItem Content="UTF-8"/>
-                                            <ComboBoxItem Content="ASCII"/>
-                                            <ComboBoxItem Content="UTF-16"/>
-                                        </ComboBox>
+                                                SelectedIndex="0" Grid.RowSpan="2"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -670,11 +651,7 @@
                                                    Height="30"
                                                    Style="{StaticResource ComboBoxStyle}"
                                                    ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                                   SelectedIndex="0" Grid.ColumnSpan="2">
-                                            <ComboBoxItem Content="MP3"/>
-                                            <ComboBoxItem Content="WAV"/>
-                                            <ComboBoxItem Content="FLAC"/>
-                                        </ComboBox>
+                                                   SelectedIndex="0" Grid.ColumnSpan="2"/>
 
                                         <TextBlock Text="Character Encoding:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8"  Grid.RowSpan="2"/>
                                         <ComboBox
@@ -685,11 +662,7 @@
                                                Height="30"
                                                Style="{StaticResource ComboBoxStyle}"
                                                ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                               SelectedIndex="0" Grid.RowSpan="2">
-                                            <ComboBoxItem Content="UTF-8"/>
-                                            <ComboBoxItem Content="ASCII"/>
-                                            <ComboBoxItem Content="UTF-16"/>
-                                        </ComboBox>
+                                               SelectedIndex="0" Grid.RowSpan="2"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -721,35 +694,36 @@
                     </TabItem>
                     <TabItem Header="Text File" Style="{StaticResource CustomTabItemStyle}" Margin="10,0,-15,0">
                         <StackPanel Margin="10,5,10,0" Background="Transparent">
-
-                            <!-- Checkbox -->
                             <CheckBox Content="Capture metadata from a text file"
-                  Foreground="#3498db"
-                  Margin="0,0,0,10"
-                  FontSize="12"
-                  FontWeight="Bold"/>
-
-
+                                      Foreground="#3498db"
+                                      Margin="0,0,0,10"
+                                      FontSize="12"
+                                      FontWeight="Bold"/>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="File:" Foreground="#94a3b8"/>
-                                <TextBox Width="250"/>
-                                <Button Content="Browse"/>
+                                <TextBlock Text="File:" Foreground="#94a3b8" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                <TextBox Width="500" Margin="10,0,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220" Height="25">
+                                    <TextBox.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="4"/>
+                                        </Style>
+                                    </TextBox.Resources>
+                                </TextBox>
+                                <Button Style="{StaticResource DarkButtonStyle}" Height="25" Margin="20,0,0,0" Content="Browse" HorizontalAlignment="Right"/>
                             </StackPanel>
-                            <!-- Metadata Section -->
                             <Border BorderBrush="#212a3b"
                                         BorderThickness="1.5"
                                         Background="#131d2f"
-                                        Padding="10"
+                                        Padding="10" Margin="0,10,0,0"
                                         CornerRadius="4">
                                 <StackPanel>
-                                    <TextBlock Text="Metadata"
-                           FontWeight="Bold"
-                           Foreground="#3498db"
-                           FontSize="12"
-                           Margin="0,0,0,10"/>
-                                 
+                                    <TextBlock Text="Text File Format"
+                                               FontWeight="Bold"
+                                               Foreground="#3498db"
+                                               FontSize="12"
+                                               Margin="0,0,0,10"/>
                                     <Grid>
                                         <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
@@ -757,28 +731,20 @@
                                             <ColumnDefinition Width="200"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-
-                                        <!-- Format -->
                                         <TextBlock Text="Format:"
-                               Grid.Row="0"
-                               Grid.Column="0"
-                               VerticalAlignment="Center"
-                               Foreground="#94a3b8"/>
+                                                   Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="#94a3b8"/>
                                         <ComboBox Grid.Row="0"
-                              Grid.Column="1"
-                              Background="Transparent"
-                              Foreground="#94a3b8"
-                              BorderThickness="0"
-                              Height="30"
-                              Style="{StaticResource ComboBoxStyle}"
-                              ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                              SelectedIndex="0">
-                                            <ComboBoxItem Content="MP3"/>
-                                            <ComboBoxItem Content="WAV"/>
-                                            <ComboBoxItem Content="FLAC"/>
-                                        </ComboBox>
-
-                                        <!-- Character Encoding -->
+                                                  Grid.Column="1"
+                                                  Background="Transparent"
+                                                  Foreground="#94a3b8"
+                                                  BorderThickness="0"
+                                                  Height="30"
+                                                  Style="{StaticResource ComboBoxStyle}"
+                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                                  SelectedIndex="0"/>
                                         <TextBlock Text="Character Encoding:"
                                                    Grid.Row="1"
                                                    Grid.Column="0"
@@ -794,23 +760,200 @@
                                                   Style="{StaticResource ComboBoxStyle}"
                                                   ItemContainerStyle="{StaticResource CleanComboBoxItem}"
                                                   SelectedIndex="0"
-                                                  Margin="0,5,0,0">
-                                            <ComboBoxItem Content="UTF-8"/>
-                                            <ComboBoxItem Content="ASCII"/>
-                                            <ComboBoxItem Content="UTF-16"/>
-                                        </ComboBox>
+                                                  Margin="0,5,0,0"/>
+                                        <CheckBox Grid.Row="2" Grid.Column="1" Content="Ignore blank files"
+                                                 Foreground="#94a3b8"
+                                                 Margin="0,5,0,10"
+                                                 FontSize="12"
+                                                 FontWeight="Bold"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
-
                         </StackPanel>
                     </TabItem>
-
                     <TabItem Header="Metadata Processor" Style="{StaticResource CustomTabItemStyle}" Margin="15,0,-20,0">
-                        <TextBlock Text="Metadata Processor settings go here" Foreground="#94a3b8" Margin="10"/>
+                        <Border BorderBrush="#212a3b"
+                                BorderThickness="1.5"
+                                Background="#131d2f"
+                                Padding="10"
+                                Margin="10"
+                                CornerRadius="4">
+                            <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          PanningMode="VerticalOnly">
+                                <StackPanel>
+                                    <CheckBox Content="Enable Metadata Processor"
+                                          Foreground="#3498db"
+                                          Margin="0,0,0,10"
+                                          FontSize="12"
+                                          FontWeight="Bold"/>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="15"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal"
+                                                Grid.Row="0"
+                                                Grid.ColumnSpan="2"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,0,0">
+                                            <TextBlock Text="If" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                                            <ComboBox Width="147" Style="{StaticResource ComboBoxStyle}"
+                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                                  Margin="5,0,0,0"
+                                                  Background="Transparent"
+                                                  Foreground="#94a3b8"
+                                                  Height="28"
+                                                  SelectedIndex="0"/>
+                                            <TextBlock Text="is" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                            <TextBox Width="145" Margin="5,0,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220" Height="28" VerticalAlignment="Center">
+                                                <TextBox.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="4"/>
+                                                    </Style>
+                                                </TextBox.Resources>
+                                            </TextBox>
+                                            <TextBlock Text="then" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                            <ComboBox  Style="{StaticResource ComboBoxStyle}"
+                                                 ItemContainerStyle="{StaticResource CleanComboBoxItem}" Width="165" Height="28" Margin="5,0,0,0" Background="Transparent" Foreground="#94a3b8" SelectedIndex="0"/>
+                                        </StackPanel>
+                                        <ItemsControl x:Name="RuleList"
+                                                  Grid.Row="1"
+                                                  Grid.ColumnSpan="2"
+                                                  Margin="0,0,0,10">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                                        <TextBlock Text="If" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                                                        <ComboBox Width="147" Style="{StaticResource ComboBoxStyle}" Height="28"
+                                                                ItemContainerStyle="{StaticResource CleanComboBoxItem}" Margin="5,0,0,0" Background="Transparent" Foreground="#94a3b8"
+                                                                SelectedValue="{Binding IfValue}"/>
+                                                        <TextBlock Text="is" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                        <TextBox Width="145" Margin="5,0,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220" Height="28" VerticalAlignment="Center">
+                                                            <TextBox.Resources>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="CornerRadius" Value="4"/>
+                                                                </Style>
+                                                            </TextBox.Resources>
+                                                        </TextBox>
+                                                        <TextBlock Text="then" Foreground="#94a3b8" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                        <ComboBox Style="{StaticResource ComboBoxStyle}"
+                                                                ItemContainerStyle="{StaticResource CleanComboBoxItem}" Height="28" Width="165" Margin="5,0,0,0" Background="Transparent" Foreground="#94a3b8"
+                                                                SelectedValue="{Binding ThenValue}"/>
+                                                        <Button Content="Remove"
+                                                            Style="{StaticResource DarkButtonStyle}"
+                                                            Background="#1e293b"
+                                                            Margin="10,0,0,0" Height="28"
+                                                            Padding="4,2"
+                                                            Click="RemoveRule_Click"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="0,0,0,5">
+                                            <TextBlock Text="otherwise" Foreground="#94a3b8" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                            <ComboBox Width="265" Height="28" Margin="5,0,0,0" Background="Transparent" Foreground="#94a3b8" BorderThickness="0" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0"/>
+                                        </StackPanel>
+                                        <Button Style="{StaticResource DarkButtonStyle}" Grid.Column="1" Grid.Row="2"
+                                                Content="Add New Rule"
+                                                Height="25"
+                                                Width="145"
+                                                HorizontalAlignment="Left"
+                                                Click="AddNewRule_Click" Margin="355,0,0,0"/>
+                                        <Border Height="2" Grid.Row="3" Background="#212a3b" Grid.ColumnSpan="2" Margin="0,5,0,5"/>
+                                        <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="When replacing metadata:" Foreground="#94a3b8" Margin="0,5,0,5"/>
+                                        <TextBlock Grid.Row="5" Margin="0,5,0,5" Text="Replace artist with:" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="5" Height="25" Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" Padding="5,4,0,0" Margin="160,0,0,30" Grid.RowSpan="2" Grid.ColumnSpan="2">
+                                            <TextBox.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="4"/>
+                                                </Style>
+                                            </TextBox.Resources>
+                                        </TextBox>
+                                        <TextBlock Grid.Row="6" Text="Replace title with:" Margin="0,5,0,0" Foreground="#94a3b8" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="6" Height="25" Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" Padding="5,4,0,0" Margin="160,5,0,3" Grid.ColumnSpan="2">
+                                            <TextBox.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="4"/>
+                                                </Style>
+                                            </TextBox.Resources>
+                                        </TextBox>
+                                        <TextBlock Grid.Row="7" Grid.ColumnSpan="2"
+                                                   Text="Tip: The artist/title can be replaced with metadata from other fields by using template tags."
+                                                   Foreground="#94a3b8" Margin="0,5,0,0"/>
+                                        <TextBlock Grid.Row="8" Grid.ColumnSpan="2"
+                                                   Text="eg. %category%"
+                                                   Foreground="#94a3b8" Margin="0,2,0,5"/>
+                                        <Button Style="{StaticResource DarkButtonStyle}"  Grid.Row="9" Content="Advanced"
+                                                Height="25"
+                                                Width="100"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                Click="Advanced_Click" Grid.Column="1"/>
+                                    </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
                     </TabItem>
                     <TabItem Header="Output Format" Style="{StaticResource CustomTabItemStyle}" Margin="19,0,-24,0">
-                        <TextBlock Text="Output Format settings go here" Margin="10"/>
+                        <StackPanel Margin="10,10,10,10">
+                            <TextBlock Text="Capture metadata from the title of another application window" Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
+                            <StackPanel Margin="4,0,0,0">
+                                <RadioButton FontWeight="Normal" Content="Artist - Title(Default)"  Foreground="#94a3b8" IsChecked="True"/>
+                                <RadioButton FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"/>
+                            </StackPanel>
+                            <TextBox Height="25" Text="%artist% - %title%" Padding="5,4,0,0" Margin="0,10,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220"  IsEnabled="True">
+                                <TextBox.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                            <Border Height="1.5" Background="#212a3b" Margin="0,10,0,2"/>
+                            <TextBlock Text="Recently received metadata tags :" Margin="0,10,0,2" Foreground="#94a3b8"/>
+                            <DataGrid x:Name="RecentMetadataGrid"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      RowBackground="#0b1220"
+                                      AlternatingRowBackground="#131d2f"
+                                      Background="#0b1220"
+                                      Foreground="#94a3b8"
+                                      BorderBrush="#212a3b"
+                                      BorderThickness="1"
+                                      Height="270"
+                                      Margin="0,5,0,10" IsReadOnly="True">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#131d2f"/>
+                                        <Setter Property="Foreground" Value="#94a3b8"/>
+                                        <Setter Property="BorderBrush" Value="#212a3b"/>
+                                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="5,2"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Metadata Field" Binding="{Binding MetadataField}" Width="100" />
+                                    <DataGridTextColumn Header="Template Variable" Binding="{Binding TemplateVariable}" Width="150" />
+                                    <DataGridTextColumn Header="Last Value" Binding="{Binding LastValue}" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
                     </TabItem>
                 </TabControl>
             </Grid>
@@ -818,6 +961,7 @@
                 <Button Style="{StaticResource DarkButtonStyle}" Content="OK" Width="80" Margin="0,0,10,0" Click="OkButton_Click"/>
                 <Button Style="{StaticResource DarkCancelButtonStyle}" Content="Cancel" Width="80" Click="Cancel_Click"/>
             </StackPanel>
+            <local:MetadataRemapping x:Name="MetadataRemappingModal" Visibility="Collapsed"/>
         </Grid>
     </Grid>
 </UserControl>

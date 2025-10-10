@@ -17,6 +17,9 @@
     <Compile Update="Views\MetaDataCapture.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\MetadataRemapping.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\ModalHeader.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,7 +1,4 @@
 ﻿using EncoderApp.Models;
-using System;
-using System.Collections.ObjectModel;
-using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,39 +7,31 @@ using System.Windows.Media;
 namespace EncoderApp.Views
 {
     /// <summary>
-    /// Interaction logic for MetaDataCapture.xaml
+    /// Interaction logic for MetadataRemapping.xaml
     /// </summary>
-    public partial class MetaDataCapture : UserControl
+    public partial class MetadataRemapping : UserControl
     {
-        private ObservableCollection<RuleModel> _rules = new ObservableCollection<RuleModel>();
-
         public event RoutedEventHandler CloseClicked;
-        public event RoutedEventHandler OkClicked;
-        public event RoutedEventHandler CancelClicked;
-        public MetaDataCapture()
+
+        public MetadataRemapping()
         {
             InitializeComponent();
-
-            RuleList.ItemsSource = _rules;
         }
 
-        private void AddNewRule_Click(object sender, RoutedEventArgs e)
+        private void Header_CloseClicked(object sender, RoutedEventArgs e)
         {
-            _rules.Add(new RuleModel
+            try
             {
-                IfValue = "MP3",
-                IsValue = "",
-                ThenValue = "Replace metadata"
-            });
-        }
+                CloseClicked?.Invoke(this, e);
+                this.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
 
-        private void RemoveRule_Click(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            if (button?.DataContext is RuleModel rule)
-                _rules.Remove(rule);
-        }
+                throw;
+            }
 
+        }
         private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is ComboBox comboBox)
@@ -65,38 +54,22 @@ namespace EncoderApp.Views
                 }
             }
         }
-        private void Header_CloseClicked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                CloseClicked?.Invoke(this, e);
-                this.Visibility = Visibility.Collapsed;
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
-        }
         private Point _startMousePosition;
         private bool _isDragging = false;
-
         private void ModalHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 _isDragging = true;
-                _startMousePosition = e.GetPosition(null); 
+                _startMousePosition = e.GetPosition(null);
                 (sender as UIElement).CaptureMouse();
             }
         }
-
         private void ModalHeader_MouseMove(object sender, MouseEventArgs e)
         {
             if (_isDragging)
             {
-                Point currentMousePosition = e.GetPosition(null); 
+                Point currentMousePosition = e.GetPosition(null);
                 Vector delta = currentMousePosition - _startMousePosition;
 
                 RootTransform.X += delta.X;
@@ -105,12 +78,12 @@ namespace EncoderApp.Views
                 _startMousePosition = currentMousePosition;
             }
         }
-
         private void ModalHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             _isDragging = false;
             (sender as UIElement).ReleaseMouseCapture();
         }
+
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -138,18 +111,7 @@ namespace EncoderApp.Views
                 Logger.LogError(ex);
                 throw;
             }
-        }
 
-        private void Advanced_Click(object sender, RoutedEventArgs e)
-        {
-            MetadataRemappingModal.Visibility = Visibility.Visible;
         }
-
-    }
-    public class RuleModel
-    {
-        public string IfValue { get; set; }
-        public string IsValue { get; set; }
-        public string ThenValue { get; set; }
     }
 }
