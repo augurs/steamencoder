@@ -306,38 +306,78 @@
                     <TabItem Header="Window Title" Style="{StaticResource CustomTabItemStyle}"  Margin="-2,0,-3,0">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="10,10,10,10">
-                                <CheckBox Content="Customize the formatting of the song metadata sent to your streams : "
-                                            Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
+                                <CheckBox x:Name="chkCustomizeFormatting" Content="Customize the formatting of the song metadata sent to your streams : "
+                                            Checked="chkCustomizeFormatting_Checked"
+                                         Unchecked="chkCustomizeFormatting_Unchecked" Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
+                                <StackPanel x:Name="MetadataSettingsPanel" IsEnabled="False" >
                                 <TextBlock Text="Step 1. Choose an app window to capture metadata from:" Foreground="#94a3b8"/>
-                                <StackPanel Orientation="Horizontal" Margin="5,10,5,5">
-                                    <TextBlock Text="Application Window" VerticalAlignment="Center" Foreground="#94a3b8" HorizontalAlignment="Left"/>
-                                    <ComboBox Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" 
-                                                Margin="15,5,0,5" Height="30" Background="#0b1220" Foreground="#94a3b8" Width="492"/>
-                                </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="5,10,5,5">
+                                        <TextBlock Text="Application Window" VerticalAlignment="Center" Foreground="#94a3b8" HorizontalAlignment="Left"/>
+                                        <Border BorderBrush="#3498db"
+                                                BorderThickness="0"
+                                                CornerRadius="4,0,0,4"
+                                                Padding="4" 
+                                                Height="28" 
+                                                Background="#0b1220" 
+                                                Margin="15,0,-4,0">
+                                            <Image Source="{Binding SelectedIcon}" Width="16" Height="16"/>
+                                        </Border>
+                                        <ComboBox x:Name="cmbActiveApps"
+                                                  ItemsSource="{Binding ActiveApps}"
+                                                  SelectedItem="{Binding SelectedApp}"
+                                                  Text="{Binding SelectedAppText}"
+                                                  Style="{StaticResource ComboBoxStyle}"
+                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}" 
+                                                  Margin="0,5,0,5" 
+                                                  Height="30" 
+                                                  Background="#0b1220" 
+                                                  Foreground="#94a3b8" 
+                                                  Width="470">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" Width="452">
+                                                        <Image Width="16" Height="16" Margin="0,0,5,0">
+                                                            <Image.Source>
+                                                                <BitmapImage UriSource="{Binding IconPath}" DecodePixelWidth="16" DecodePixelHeight="16" />
+                                                            </Image.Source>
+                                                        </Image>
+                                                        <TextBlock Text="{Binding WindowTitle}" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
                                 <DockPanel Margin="0,0,0,5" LastChildFill="True">
-                                    <Button Style="{StaticResource DarkButtonStyle}" Content="Refresh List" Width="100" Height="28" DockPanel.Dock="Left" Margin="0,0,10,0"/>
+                                        <Button Click="RefreshList_Click" Style="{StaticResource DarkButtonStyle}" Content="Refresh List" Width="100" Height="28" DockPanel.Dock="Left" Margin="0,0,10,0"/>
                                     <CheckBox Content="Only list windows making sound" Foreground="#94a3b8" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="ExtraLight" FontSize="13"/>
                                 </DockPanel>
                                 <Border Height="1.5" Background="#212a3b" Margin="0,5,0,2"/>
                                 <TextBlock Text="Step 2. Choose the format that matches the window title:" Margin="0,10,0,5" Foreground="#94a3b8"/>
-                                <StackPanel Margin="4,0,0,0">
-                                    <RadioButton FontWeight="Normal" Content="Artist - Title - Window Title" Foreground="#94a3b8" IsChecked="True"/>
-                                    <RadioButton FontWeight="Normal" Content="Window Title - Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"/>
-                                    <RadioButton FontWeight="Normal" Content="Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"/>
-                                    <RadioButton FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"/>
-                                </StackPanel>
-                                <TextBox Height="25" Text="%artist% - %title% - %appname%" Padding="5,4,0,0" Margin="0,10,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220"  IsEnabled="True">
-                                    <TextBox.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="4"/>
-                                        </Style>
-                                    </TextBox.Resources>
-                                </TextBox>
-                                <TextBlock Text="Preview:" Margin="0,10,0,2" Foreground="#94a3b8"/>
+                                    <StackPanel Margin="4,0,0,0">
+                                        <RadioButton FontWeight="Normal" Content="Artist - Title - Window Title" Foreground="#94a3b8"
+                                                     IsChecked="True" Checked="RadioButton_Checked"/>
+                                        <RadioButton FontWeight="Normal" Content="Window Title - Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"
+                                                     Checked="RadioButton_Checked"/>
+                                        <RadioButton FontWeight="Normal" Content="Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"
+                                                     Checked="RadioButton_Checked"/>
+                                        <RadioButton x:Name="rbCustom" IsChecked="False" FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"
+                                                     Checked="RadioButton_Checked"/>
+                                    </StackPanel>
+                                    <TextBox Height="25" x:Name="txtCustom" IsEnabled="False"
+                                             Text="%artist% - %title% - %appname%" Padding="5,4,0,0" Margin="0,10,0,0"
+                                             Foreground="#94a3b8" BorderThickness="0" Background="#0b1220">
+                                        <TextBox.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="4"/>
+                                            </Style>
+                                        </TextBox.Resources>
+                                    </TextBox>
+                                    <TextBlock Text="Preview:" Margin="0,10,0,2" Foreground="#94a3b8"/>
                                 <StackPanel Margin="0,0,0,0">
                                     <TextBlock Text="Artist :" Foreground="#94a3b8" FontWeight="Normal"/>
                                     <TextBlock Text="Title:" Margin="0,5,0,0" Foreground="#94a3b8" FontWeight="Normal"/>
                                 </StackPanel>
+                            </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
@@ -501,7 +541,7 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Server Hostname or IP:" Foreground="#94a3b8" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left"  Width="350" Height="25" Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" Padding="5,4,0,0">
+                                        <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left"  Width="443" Height="25" Background="#0b1220" Foreground="#94a3b8" BorderThickness="0" Padding="5,4,0,0">
                                             <TextBox.Resources>
                                                 <Style TargetType="Border">
                                                     <Setter Property="CornerRadius" Value="4"/>
@@ -911,10 +951,10 @@
                         <StackPanel Margin="10,10,10,10">
                             <TextBlock Text="Capture metadata from the title of another application window" Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
                             <StackPanel Margin="4,0,0,0">
-                                <RadioButton FontWeight="Normal" Content="Artist - Title(Default)"  Foreground="#94a3b8" IsChecked="True"/>
-                                <RadioButton FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"/>
+                                <RadioButton FontWeight="Normal" Content="Artist - Title(Default)"  Foreground="#94a3b8" IsChecked="True" Checked="RBOuputFormat_Checked" Unchecked="RBOuputFormat_Unchecked"/>
+                                <RadioButton x:Name="CustomRBtn" FontWeight="Normal" Content="Custom:" Margin="0,5,0,0"  IsChecked="False" Foreground="#94a3b8"  Checked="RBOuputFormat_Checked" Unchecked="RBOuputFormat_Unchecked"/>
                             </StackPanel>
-                            <TextBox Height="25" Text="%artist% - %title%" Padding="5,4,0,0" Margin="0,10,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220"  IsEnabled="True">
+                            <TextBox x:Name="CustomTxtOutput" IsEnabled="False" Height="25" Text="%artist% - %title%" Padding="5,4,0,0" Margin="0,10,0,0" Foreground="#94a3b8" BorderThickness="0" Background="#0b1220">
                                 <TextBox.Resources>
                                     <Style TargetType="Border">
                                         <Setter Property="CornerRadius" Value="4"/>
