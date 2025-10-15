@@ -12,7 +12,7 @@ namespace EncoderApp.Models
         public string WindowTitle { get; set; }
         public int ProcessId { get; set; }
         public string IconPath { get; set; }
-
+        public bool IsRecent { get; set; }
         public override string ToString()
         {
             return WindowTitle ?? ProcessName ?? base.ToString();

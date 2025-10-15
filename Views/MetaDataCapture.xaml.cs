@@ -28,6 +28,7 @@ namespace EncoderApp.Views
             InitializeComponent();
             viewModel = new MetaDataViewModel();
             this.DataContext = viewModel;
+            this.Loaded += (s, e) => viewModel.Initialize();
 
             RuleList.ItemsSource = _rules;
             MetadataSettingsPanel.Opacity = 0.5;
@@ -47,17 +48,23 @@ namespace EncoderApp.Views
         }
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            if (rbCustom == null || txtCustom == null) return;
+            if (sender is RadioButton rb && DataContext is MetaDataViewModel viewModel)
+            {
+                viewModel.SelectedFormat = rb.Name;
+                if (rbCustom == null || txtCustom == null) return;
 
-            if (rbCustom.IsChecked == true)
-            {
-                txtCustom.IsEnabled = true;
-                txtCustom.Opacity = 1;
-            }
-            else
-            {
-                txtCustom.IsEnabled = false;
-                txtCustom.Opacity = 0.5;
+                if (rbCustom.IsChecked == true)
+                {
+                    txtCustom.IsEnabled = true;
+                    txtCustom.Opacity = 1;
+                }
+                else
+                {
+                    txtCustom.IsEnabled = false;
+                    txtCustom.Opacity = 0.5;
+                }
+
+                viewModel.UpdateMetadata();
             }
         }
         private void RadioButton_Unchecked(object sender, RoutedEventArgs e)

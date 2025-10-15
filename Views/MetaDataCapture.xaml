@@ -13,6 +13,154 @@
         <TranslateTransform x:Name="RootTransform"/>
     </UserControl.RenderTransform>
     <UserControl.Resources>
+        <Style x:Key="WindowComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="450"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ComboBox_PreviewMouseLeftButtonDown"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border x:Name="OuterBorder"
+                                BorderThickness="1"
+                                Background="#0b1220"
+                                CornerRadius="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="38"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="PART_EditableTextBox"
+                                         Grid.Column="0"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="14"
+                                         Foreground="#94a3b8"
+                                         Padding="2,0,0,0"
+                                         Visibility="Hidden"/>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <Image Source="{Binding SelectedIcon}" Width="18" Height="18" Margin="0,0,5,0" HorizontalAlignment="Left"/>
+                                    <ContentPresenter x:Name="ContentSite"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"
+                                                      Content="{Binding SelectedValue, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                      RecognizesAccessKey="True"/>
+                                </StackPanel>
+                                <ToggleButton Grid.Column="1"
+                                              x:Name="ToggleButton"
+                                              Cursor="Hand"
+                                              Focusable="False"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ClickMode="Press"
+                                              Background="Transparent"
+                                              BorderBrush="black"
+                                              BorderThickness="0"
+                                              Foreground="#94a3b8"
+                                              OverridesDefaultStyle="True"
+                                              HorizontalAlignment="Center"
+                                              Height="37"
+                                              Width="38"
+                                              VerticalAlignment="Center">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Grid Background="{TemplateBinding Background}">
+                                                            <Path x:Name="Arrow"
+                                                                  Data="M0,0 L4,4 L8,0"
+                                                                  Stroke="#445370"
+                                                                  StrokeThickness="1.5"
+                                                                  Fill="Transparent"
+                                                                  Width="8"
+                                                                  Height="5"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#F0F0F0"/>
+                                                                <Setter Property="Foreground" Value="#94a3b8"/>
+                                                                <Setter TargetName="Arrow" Property="Stroke" Value="DarkGray"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter TargetName="Arrow" Property="Stroke" Value="#CCC"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                                <Popup Name="Popup"
+                                       Placement="Bottom"
+                                       IsOpen="{TemplateBinding IsDropDownOpen}"
+                                       AllowsTransparency="True"
+                                       Focusable="False"
+                                       PopupAnimation="Slide">
+                                    <Grid MaxHeight="200"
+                                          MinWidth="{TemplateBinding ActualWidth}"
+                                          SnapsToDevicePixels="True"
+                                          Background="#445370"
+                                          Margin="0,1,0,0">
+                                        <Border BorderThickness="1" Background="#131d2f"/>
+                                        <StackPanel IsItemsHost="True"/>
+                                    </Grid>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#445370"/>
+                                <Setter TargetName="OuterBorder" Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="OuterBorder" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem" x:Key="WindowCleanComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                             Background="{TemplateBinding Background}"
+                             Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#15233c"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#253552"/>
+                                <Setter Property="Foreground" Value="#94a3b8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#94a3b8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="ModernTabItemStyle" TargetType="TabItem">
             <Setter Property="Foreground" Value="#94a3b8"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -91,7 +239,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style x:Key="ComboBoxStyle" TargetType="ComboBox">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="OverridesDefaultStyle" Value="True"/>
@@ -213,7 +360,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style TargetType="ComboBoxItem" x:Key="CleanComboBoxItem">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#94a3b8"/>
@@ -242,7 +388,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style x:Key="DarkButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#3498db"/>
             <Setter Property="Foreground" Value="White"/>
@@ -276,7 +421,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style x:Key="DarkCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource DarkButtonStyle}">
             <Setter Property="Background" Value="#212a3b"/>
             <Setter Property="Foreground" Value="#94a3b8"/>
@@ -307,38 +451,30 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="10,10,10,10">
                                 <CheckBox x:Name="chkCustomizeFormatting" Content="Customize the formatting of the song metadata sent to your streams : "
-                                            Checked="chkCustomizeFormatting_Checked"
-                                         Unchecked="chkCustomizeFormatting_Unchecked" Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
+                                          Checked="chkCustomizeFormatting_Checked"
+                                          Unchecked="chkCustomizeFormatting_Unchecked" Foreground="#3498db" Margin="0,0,0,10" FontSize="12" FontWeight="Bold"/>
                                 <StackPanel x:Name="MetadataSettingsPanel" IsEnabled="False" >
                                 <TextBlock Text="Step 1. Choose an app window to capture metadata from:" Foreground="#94a3b8"/>
                                     <StackPanel Orientation="Horizontal" Margin="5,10,5,5">
                                         <TextBlock Text="Application Window" VerticalAlignment="Center" Foreground="#94a3b8" HorizontalAlignment="Left"/>
-                                        <Border BorderBrush="#3498db"
-                                                BorderThickness="0"
-                                                CornerRadius="4,0,0,4"
-                                                Padding="4" 
-                                                Height="28" 
-                                                Background="#0b1220" 
-                                                Margin="15,0,-4,0">
-                                            <Image Source="{Binding SelectedIcon}" Width="16" Height="16"/>
-                                        </Border>
                                         <ComboBox x:Name="cmbActiveApps"
                                                   ItemsSource="{Binding ActiveApps}"
                                                   SelectedItem="{Binding SelectedApp}"
                                                   Text="{Binding SelectedAppText}"
-                                                  Style="{StaticResource ComboBoxStyle}"
-                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}" 
-                                                  Margin="0,5,0,5" 
+                                                  Style="{StaticResource WindowComboBoxStyle}" 
+                                                  ItemContainerStyle="{StaticResource WindowCleanComboBoxItem}" 
+                                                  Margin="15,5,0,5" 
                                                   Height="30" 
                                                   Background="#0b1220" 
                                                   Foreground="#94a3b8" 
-                                                  Width="470">
+                                                  Width="492">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal" Width="452">
+                                                    <StackPanel Orientation="Horizontal" Width="477">
                                                         <Image Width="16" Height="16" Margin="0,0,5,0">
                                                             <Image.Source>
-                                                                <BitmapImage UriSource="{Binding IconPath}" DecodePixelWidth="16" DecodePixelHeight="16" />
+                                                                <BitmapImage UriSource="{Binding IconPath, FallbackValue={x:Null}}" 
+                                                                             DecodePixelWidth="16" DecodePixelHeight="16" />
                                                             </Image.Source>
                                                         </Image>
                                                         <TextBlock Text="{Binding WindowTitle}" VerticalAlignment="Center" />
@@ -349,18 +485,18 @@
                                     </StackPanel>
                                 <DockPanel Margin="0,0,0,5" LastChildFill="True">
                                         <Button Click="RefreshList_Click" Style="{StaticResource DarkButtonStyle}" Content="Refresh List" Width="100" Height="28" DockPanel.Dock="Left" Margin="0,0,10,0"/>
-                                    <CheckBox Content="Only list windows making sound" Foreground="#94a3b8" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="ExtraLight" FontSize="13"/>
+                                        <CheckBox IsChecked="{Binding OnlyListSoundingWindows, Mode=TwoWay}" Content="Only list windows making sound" Foreground="#94a3b8" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="ExtraLight" FontSize="13"/>
                                 </DockPanel>
                                 <Border Height="1.5" Background="#212a3b" Margin="0,5,0,2"/>
                                 <TextBlock Text="Step 2. Choose the format that matches the window title:" Margin="0,10,0,5" Foreground="#94a3b8"/>
                                     <StackPanel Margin="4,0,0,0">
-                                        <RadioButton FontWeight="Normal" Content="Artist - Title - Window Title" Foreground="#94a3b8"
-                                                     IsChecked="True" Checked="RadioButton_Checked"/>
-                                        <RadioButton FontWeight="Normal" Content="Window Title - Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"
+                                        <RadioButton x:Name="rbArtistWindow" FontWeight="Normal" Content="Artist - Title - Window Title" Foreground="#94a3b8"
+                                                   IsChecked="True" Checked="RadioButton_Checked"/>
+                                        <RadioButton x:Name="rbWindowArtist" FontWeight="Normal" Content="Window Title - Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"
                                                      Checked="RadioButton_Checked"/>
-                                        <RadioButton FontWeight="Normal" Content="Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"
+                                        <RadioButton x:Name="rbArtistTitle" FontWeight="Normal" Content="Artist - Title" Margin="0,5,0,0" Foreground="#94a3b8"
                                                      Checked="RadioButton_Checked"/>
-                                        <RadioButton x:Name="rbCustom" IsChecked="False" FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"
+                                        <RadioButton x:Name="rbCustom" FontWeight="Normal" Content="Custom:" Margin="0,5,0,0" Foreground="#94a3b8"
                                                      Checked="RadioButton_Checked"/>
                                     </StackPanel>
                                     <TextBox Height="25" x:Name="txtCustom" IsEnabled="False"
@@ -374,9 +510,15 @@
                                     </TextBox>
                                     <TextBlock Text="Preview:" Margin="0,10,0,2" Foreground="#94a3b8"/>
                                 <StackPanel Margin="0,0,0,0">
-                                    <TextBlock Text="Artist :" Foreground="#94a3b8" FontWeight="Normal"/>
-                                    <TextBlock Text="Title:" Margin="0,5,0,0" Foreground="#94a3b8" FontWeight="Normal"/>
-                                </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Artist :" Foreground="#94a3b8" FontWeight="Normal" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding Artist}" Foreground="#94a3b8" FontWeight="Normal" Margin="0,0,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Title:" Margin="0,5,10,0" Foreground="#94a3b8" FontWeight="Normal" />
+                                            <TextBlock Text="{Binding Title}" Margin="0,5,0,0" Foreground="#94a3b8" FontWeight="Normal"/>
+                                        </StackPanel>
+                               </StackPanel>
                             </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -408,13 +550,13 @@
                                                 <ColumnDefinition Width="20"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBox x:Name="portTxt"
-                                                          Text="9002"
-                                                          HorizontalContentAlignment="Center"
-                                                          VerticalContentAlignment="Center"
-                                                          Background="#0b1220"
-                                                          Foreground="#94a3b8"
-                                                          BorderThickness="0"
-                                                          FontSize="12"/>
+                                                     Text="9002"
+                                                     HorizontalContentAlignment="Center"
+                                                     VerticalContentAlignment="Center"
+                                                     Background="#0b1220"
+                                                     Foreground="#94a3b8"
+                                                     BorderThickness="0"
+                                                     FontSize="12"/>
                                             <StackPanel Grid.Column="1" Orientation="Vertical">
                                                 <RepeatButton Content="▲" Height="12" FontSize="8"/>
                                                 <RepeatButton Content="▼" Height="12" FontSize="8" />
@@ -439,7 +581,6 @@
                                     </Grid>
                                 </StackPanel>
                             </Border>
-
                             <Border BorderBrush="#212a3b" BorderThickness="1.5" Background="#131d2f" Padding="10" CornerRadius="4" Margin="0,5,0,0">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="Transparent" Margin="0,-8,0,0">
@@ -456,7 +597,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="Format :" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8" Margin="0,2,0,0"/>
                                         <ComboBox Grid.Row="0"
-                                                 Grid.Column="1"
+                                                  Grid.Column="1"
                                                   Background="Transparent"
                                                   Foreground="#94a3b8"
                                                   BorderThickness="0"
@@ -587,24 +728,24 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Text="Format :" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8" Margin="0,2,0,0"/>
                                         <ComboBox Grid.Row="0"
-                                                   Grid.Column="1"
-                                                    Background="Transparent"
-                                                    Foreground="#94a3b8"
-                                                    BorderThickness="0"
-                                                    Height="30"
-                                                    Style="{StaticResource ComboBoxStyle}"
-                                                    ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                                    SelectedIndex="0" Grid.ColumnSpan="2"/>
+                                                  Grid.Column="1"
+                                                  Background="Transparent"
+                                                  Foreground="#94a3b8"
+                                                  BorderThickness="0"
+                                                  Height="30"
+                                                  Style="{StaticResource ComboBoxStyle}"
+                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                                  SelectedIndex="0" Grid.ColumnSpan="2"/>
                                         <TextBlock Text="Character Encoding:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8"  Grid.RowSpan="2"/>
-                                        <ComboBox
-                                                Grid.Row="1" Grid.Column="1" 
-                                                Background="Transparent"
-                                                Foreground="#94a3b8"
-                                                BorderThickness="0"
-                                                Height="30"
-                                                Style="{StaticResource ComboBoxStyle}"
-                                                ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                                SelectedIndex="0" Grid.RowSpan="2"/>
+                                        <ComboBox Grid.Row="1" 
+                                                  Grid.Column="1" 
+                                                  Background="Transparent"
+                                                  Foreground="#94a3b8"
+                                                  BorderThickness="0"
+                                                  Height="30"
+                                                  Style="{StaticResource ComboBoxStyle}"
+                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                                  SelectedIndex="0" Grid.RowSpan="2"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -685,13 +826,13 @@
                                         <TextBlock Text="Format :" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8" Margin="0,2,0,0"/>
                                         <ComboBox Grid.Row="0"
                                                   Grid.Column="1"
-                                                   Background="Transparent"
-                                                   Foreground="#94a3b8"
-                                                   BorderThickness="0"
-                                                   Height="30"
-                                                   Style="{StaticResource ComboBoxStyle}"
-                                                   ItemContainerStyle="{StaticResource CleanComboBoxItem}"
-                                                   SelectedIndex="0" Grid.ColumnSpan="2"/>
+                                                  Background="Transparent"
+                                                  Foreground="#94a3b8"
+                                                  BorderThickness="0"
+                                                  Height="30"
+                                                  Style="{StaticResource ComboBoxStyle}"
+                                                  ItemContainerStyle="{StaticResource CleanComboBoxItem}"
+                                                  SelectedIndex="0" Grid.ColumnSpan="2"/>
 
                                         <TextBlock Text="Character Encoding:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Foreground="#94a3b8"  Grid.RowSpan="2"/>
                                         <ComboBox
@@ -712,7 +853,6 @@
                                         <TextBlock Text="Instructions" FontWeight="Bold" Foreground="#3498db" FontSize="12" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <TextBlock Margin="0,4,0,0" Foreground="#94a3b8" Text="Please configure your other software to send metadata updates to stream encoder via UDP at:"/>
-
                                     <Grid Margin="0,4,0,0">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
