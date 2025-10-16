@@ -1,43 +1,43 @@
 ﻿<Data>
 	<Stream>
 		<Name>Main Stream</Name>
-		<Mount>Mount:/live</Mount>
+		<Mount>live</Mount>
 		<IsConnected>true</IsConnected>
 	</Stream>
 	<Stream>
 		<Name>Backup Stream</Name>
-		<Mount>Mount:/backup</Mount>
+		<Mount>backup</Mount>
 		<IsConnected>false</IsConnected>
 	</Stream>
 	<Stream>
 		<Name>Music Stream</Name>
-		<Mount>Mount:/music</Mount>
+		<Mount>music</Mount>
 		<IsConnected>true</IsConnected>
 	</Stream>
 	<Stream>
 		<Name>News Stream</Name>
-		<Mount>Mount:/news</Mount>
+		<Mount>news</Mount>
 		<IsConnected>false</IsConnected>
 		<IsError>true</IsError>
 	</Stream>
 	<Stream>
 		<Name>Sports Stream</Name>
-		<Mount>Mount:/sports</Mount>
+		<Mount>sports</Mount>
 		<IsConnected>true</IsConnected>
 	</Stream>
 	<Stream>
 		<Name>Talk Stream</Name>
-		<Mount>Mount:/talk</Mount>
+		<Mount>talk</Mount>
 		<IsConnected>false</IsConnected>
 	</Stream>
 	<Stream>
 		<Name>Weather Stream</Name>
-		<Mount>Mount:/weather</Mount>
+		<Mount>weather</Mount>
 		<IsConnected>true</IsConnected>
 	</Stream>
 	<Stream>
 		<Name>Event Stream</Name>
-		<Mount>Mount:/event</Mount>
+		<Mount>event</Mount>
 		<IsConnected>false</IsConnected>
 		<IsError>true</IsError>
 	</Stream>

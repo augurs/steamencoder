@@ -4,15 +4,38 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EncoderApp.Views"
+             xmlns:convertor="clr-namespace:EncoderApp.Convertors"
              mc:Ignorable="d" 
-             d:DesignHeight="650" d:DesignWidth="800">
+             d:DesignHeight="580" d:DesignWidth="800">
     <UserControl.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#071024" Offset="0"/>
             <GradientStop Color="#06122b" Offset="1"/>
         </LinearGradientBrush>
     </UserControl.Background>
+    <UserControl.RenderTransform>
+        <TranslateTransform X="{Binding RootTransform.X}" Y="{Binding RootTransform.Y}"/>
+    </UserControl.RenderTransform>
     <UserControl.Resources>
+        <Style x:Key="PlaceholderTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="5,5,0,3"/>
+            <Setter Property="MinWidth" Value="210"/>
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Background" Value="#0b1220"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="4" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <convertor:PlaceholderConverter x:Key="PlaceholderConverter"/>
         <Style x:Key="MenuButtonStyle" TargetType="RadioButton">
             <Setter Property="Background" Value="#131d2f"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -151,52 +174,51 @@
             <Setter Property="Height" Value="40"/>
             <Setter Property="Foreground" Value="#94a3b8"/>
             <Setter Property="Width" Value="215"/>
-            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ComboBox_PreviewMouseLeftButtonDown"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
                         <Border x:Name="OuterBorder"
-                                  BorderThickness="1"
-                                  Background="#0b1220"
-                                  CornerRadius="6">
+                                BorderThickness="1"
+                                Background="#0b1220"
+                                CornerRadius="6">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="38"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox x:Name="PART_EditableTextBox"
-                                           Grid.Column="0"
-                                           Background="Transparent"
-                                           BorderThickness="0"
-                                           VerticalContentAlignment="Center"
-                                           FontSize="14"
-                                           FontFamily="pack://application:,,,/Font/#Urbanist"
-                                           Foreground="#94a3b8"
-                                           Padding="8,0,0,0"
-                                           Visibility="Hidden"/>
+                                         Grid.Column="0"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="14"
+                                         FontFamily="pack://application:,,,/Font/#Urbanist"
+                                         Foreground="#94a3b8"
+                                         Padding="8,0,0,0"
+                                         Visibility="Hidden"/>
                                 <ContentPresenter x:Name="ContentSite"
-                                                    Grid.Column="0"
-                                                    Margin="8,0,0,0"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Left"
-                                                    Content="{Binding SelectedValue, RelativeSource={RelativeSource TemplatedParent}}"
-                                                    ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
-                                                    RecognizesAccessKey="True"/>
+                                                 Grid.Column="0"
+                                                 Margin="8,0,0,0"
+                                                 VerticalAlignment="Center"
+                                                 HorizontalAlignment="Left"
+                                                 Content="{Binding SelectedValue, RelativeSource={RelativeSource TemplatedParent}}"
+                                                 ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                 RecognizesAccessKey="True"/>
                                 <ToggleButton Grid.Column="1"
-                                                x:Name="ToggleButton"
-                                                Cursor="Hand"
-                                                Focusable="False"
-                                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                                ClickMode="Press"
-                                                Background="Transparent"
-                                                BorderBrush="black"
-                                                BorderThickness="0"
+                                              x:Name="ToggleButton"
+                                              Cursor="Hand"
+                                              Focusable="False"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ClickMode="Press"
+                                              Background="Transparent"
+                                              BorderBrush="black"
+                                              BorderThickness="0"
                                               Foreground="#94a3b8"
-                                                OverridesDefaultStyle="True"
-                                                HorizontalAlignment="Center"
-                                                Height="37"
-                                                Width="38"
-                                                VerticalAlignment="Center">
+                                              OverridesDefaultStyle="True"
+                                              HorizontalAlignment="Center"
+                                              Height="37"
+                                              Width="38"
+                                              VerticalAlignment="Center">
                                     <ToggleButton.Style>
                                         <Style TargetType="ToggleButton">
                                             <Setter Property="Background" Value="Transparent"/>
@@ -205,14 +227,14 @@
                                                     <ControlTemplate TargetType="ToggleButton">
                                                         <Grid Background="{TemplateBinding Background}">
                                                             <Path x:Name="Arrow"
-                                                                    Data="M0,0 L4,4 L8,0"
-                                                                    Stroke="#445370"
-                                                                    StrokeThickness="1.5"
-                                                                    Fill="Transparent"
-                                                                    Width="8"
-                                                                    Height="5"
-                                                                    HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center"/>
+                                                                  Data="M0,0 L4,4 L8,0"
+                                                                  Stroke="#445370"
+                                                                  StrokeThickness="1.5"
+                                                                  Fill="Transparent"
+                                                                  Width="8"
+                                                                  Height="5"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
                                                         </Grid>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">
@@ -230,21 +252,18 @@
                                         </Style>
                                     </ToggleButton.Style>
                                 </ToggleButton>
-
                                 <Popup Name="Popup"
-                                         Placement="Bottom"
-                                         IsOpen="{TemplateBinding IsDropDownOpen}"
-                                         AllowsTransparency="True"
-                                         Focusable="False"
-                                         PopupAnimation="Slide">
+                                       Placement="Bottom"
+                                       IsOpen="{TemplateBinding IsDropDownOpen}"
+                                       AllowsTransparency="True"
+                                       Focusable="False"
+                                       PopupAnimation="Slide">
                                     <Grid MaxHeight="200"
-                                            MinWidth="{TemplateBinding ActualWidth}"
-                                            SnapsToDevicePixels="True"
-                                            Background="#445370"
-                                            Margin="0,1,0,0" Width="148" >
-                                        <Border 
-                                              BorderThickness="2"
-                                              Background="#131d2f"/>
+                                          MinWidth="{TemplateBinding ActualWidth}"
+                                          SnapsToDevicePixels="True"
+                                          Background="#445370"
+                                          Margin="0,1,0,0" Width="148">
+                                        <Border BorderThickness="2" Background="#131d2f"/>
                                         <StackPanel IsItemsHost="True"/>
                                     </Grid>
                                 </Popup>
@@ -277,8 +296,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBoxItem">
                         <Border x:Name="Bd"
-                         Background="{TemplateBinding Background}"
-                         Padding="{TemplateBinding Padding}">
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -304,30 +323,66 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Border Grid.Column="0" Grid.Row="0" BorderBrush="#212a3b" CornerRadius="4" Background="#131d2f" BorderThickness="1" Margin="10">
+        <local:ModalHeader VerticalAlignment="Center"
+                           Title="Streams"
+                           CloseClicked="Header_CloseClicked"
+                           Grid.ColumnSpan="2"/>
+        <Border Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" BorderBrush="#212a3b" CornerRadius="4" Background="#131d2f" BorderThickness="1" Margin="10">
             <StackPanel Orientation="Vertical" Margin="10">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Background="Transparent">
                     <Image Source="/Images/stream.png" Width="25" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <TextBlock Text="Streams" Foreground="#3498db" Margin="0,-2,5,0" FontSize="20" VerticalAlignment="Center"/>
                 </StackPanel>
-                <Border BorderBrush="#212a3b" BorderThickness="2" Margin="5,5,5,0" Height="400" Padding="1">
-                    <RadioButton Style="{StaticResource MenuButtonStyle}" Width="242" Height="30" VerticalAlignment="Top" GroupName="MenuGroup" Cursor="Hand" IsChecked="True" Foreground="#94a3b8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="New Stream" Foreground="#94a3b8"/>
-                        </StackPanel>
-                    </RadioButton>
+                <Border BorderBrush="#212a3b" BorderThickness="2" Margin="5,5,5,0" Height="400" Padding="5">
+                    <ListBox ItemsSource="{Binding AllStream}"
+                             SelectedItem="{Binding SelectedStream, Mode=TwoWay}"
+                             Background="#06122b"
+                             Foreground="#94a3b8"
+                             BorderThickness="0"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Margin" Value="3"/>
+                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="border"
+                                                    Background="#0b1220"
+                                                    CornerRadius="4"
+                                                    Padding="6">
+                                                <ContentPresenter Content="{Binding Name}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#3498db"/>
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#1e293b"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
                 </Border>
                 <StackPanel Height="30" Orientation="Horizontal" Margin="5,5,5,0">
-                    <Button Content="Add new" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" />
-                    <Button Content="Remove" Style="{StaticResource DarkCancelButtonStyle}" Width="80" Height="26" Margin="5,0,5,0"/>
-                    <Button Content="Clone" Style="{StaticResource DarkButtonStyle}"  Height="26" Width="79" Margin="0,0,5,0"/>
+                    <Button Content="Add new" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Click="AddNewStream_Click"/>
+                    <Button Content="Remove" Style="{StaticResource DarkCancelButtonStyle}" Width="80" Height="26" Margin="5,0,5,0" Click="RemoveStream_Click"/>
+                    <Button Content="Clone" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Margin="0,0,5,0" Click="CloneStream_Click"/>
                 </StackPanel>
             </StackPanel>
         </Border>
-        <Border Grid.Column="1" Grid.Row="0" BorderBrush="#212a3b" BorderThickness="1" CornerRadius="4" Background="#131d2f" Margin="10">
+        <Border Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" BorderBrush="#212a3b" BorderThickness="1" CornerRadius="4" Background="#131d2f" Margin="10,10,10,0">
             <Grid Margin="15,10,10,10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -344,7 +399,6 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="*"/>
@@ -355,28 +409,35 @@
                 </StackPanel>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Foreground="#94a3b8"/>
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                    <TextBox x:Name="StreamNameTxt" FontSize="12" Height="28" Margin="0,0,7,0" Padding="5,5,0,3" MinWidth="210" Text="My Radio Station"
-                             Foreground="SlateGray" Background="#0b1220" BorderThickness="0" GotFocus="StreamNameTxt_GotFocus" LostFocus="StreamNameTxt_LostFocus">
+                    <TextBox x:Name="StreamNameTxt" GotFocus="StreamNameTxt_GotFocus" LostFocus="StreamNameTxt_LostFocus" Text="{Binding StreamName}" FontSize="12" Height="28" Margin="0,0,7,0" Padding="5,5,0,3" MinWidth="210" 
+                             Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                         <TextBox.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="4"/>
                             </Style>
                         </TextBox.Resources>
                     </TextBox>
-                    <Button Content="Advanced" Click="Advanced_Click" Height="26" FontSize="12" Width="82" Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource HoverButtonStyle}"  />
+                    <Button Content="Advanced" Click="Advanced_Click" Height="26" FontSize="12" Width="82" Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource HoverButtonStyle}"/>
                 </StackPanel>
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Server Type:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,10,0,5" Background="Transparent" Foreground="#94a3b8" BorderThickness="0" 
-                          SelectedValuePath="Content" Height="30" Width="301" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0">
+                <ComboBox SelectedValue="{Binding SelectedServerType, Mode=TwoWay}"
+                          Grid.Row="2" 
+                          Grid.Column="1"
+                          Margin="0,10,0,5"
+                          Background="Transparent"
+                          Foreground="#94a3b8"
+                          BorderThickness="0" 
+                          SelectedValuePath="Content"
+                          Height="30" Width="301"
+                          Style="{StaticResource ComboBoxStyle}"
+                          ItemContainerStyle="{StaticResource CleanComboBoxItem}" 
+                          SelectedIndex="0"
+                          PreviewMouseLeftButtonDown="ComboBox_PreviewMouseLeftButtonDown">
                     <ComboBoxItem Content="IceCast 2"/>
-                    <ComboBoxItem Content="IceCast 2 with SSL"/>
-                    <ComboBoxItem Content="Radio Mast"/>
-                    <ComboBoxItem Content="Shoutcast 1 (Legacy)"/>
-                    <ComboBoxItem Content="Shoutcast 1"/>
                 </ComboBox>
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Hostname or IP:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <TextBox x:Name="HostNameTxt" Grid.Row="3" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
-                         MinWidth="210" Text="mystation.in.airtime.pro" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                <TextBox x:Name="HostNameTxt" GotFocus="HostNameTxt_GotFocus" LostFocus="HostNameTxt_LostFocus" Grid.Row="3" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
+                         MinWidth="210" Text="{Binding HostNameOrIP}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -384,27 +445,27 @@
                     </TextBox.Resources>
                 </TextBox>
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Port:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <Grid Width="60" Height="26"   Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left">
+                <Grid Width="60" Height="26" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="20"/>
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="portTextBox"
-                              Text="8000"
-                              HorizontalContentAlignment="Center"
-                              VerticalContentAlignment="Center"
-                              Background="#0b1220"
-                              Foreground="#94a3b8"
-                              BorderThickness="0"
-                              FontSize="12"/>
+                             Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             Background="#0b1220"
+                             Foreground="#94a3b8"
+                             BorderThickness="0"
+                             FontSize="12"/>
                     <StackPanel Grid.Column="1" Orientation="Vertical">
                         <RepeatButton Content="▲" Height="14" FontSize="8" Click="IncrementPort_Click" Padding="0,0,0,2"/>
                         <RepeatButton Content="▼" Height="15" FontSize="8" Click="DecrementPort_Click" Padding="0,-1,0,0"/>
                     </StackPanel>
                 </Grid>
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Mount:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <TextBox x:Name="MountTxt" Grid.Row="5" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
-                         MinWidth="210" Text="/stream" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                <TextBox x:Name="MountTxt" GotFocus="MountTxt_GotFocus" LostFocus="MountTxt_LostFocus" Grid.Row="5" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
+                         MinWidth="210" Text="{Binding Mount}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -412,8 +473,8 @@
                     </TextBox.Resources>
                 </TextBox>
                 <TextBlock Grid.Row="6" Grid.Column="0" Text="UserName:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <TextBox x:Name="UserNameTxt" Grid.Row="6" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3"
-                         MinWidth="210" Text="source" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                <TextBox x:Name="UserNameTxt" GotFocus="UserNameTxt_GotFocus" LostFocus="UserNameTxt_LostFocus" Grid.Row="6" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3"
+                         MinWidth="210" Text="{Binding UserName}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -421,8 +482,8 @@
                     </TextBox.Resources>
                 </TextBox>
                 <TextBlock Grid.Row="7" Grid.Column="0" Text="Password:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <TextBox x:Name="PasswordTxt" Grid.Row="7" Grid.Column="1"  FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
-                         MinWidth="210" Text="password" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                <TextBox x:Name="PasswordTxt" GotFocus="Pass_GotFoucs" LostFocus="Pass_LostFocus" Grid.Row="7" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
+                         MinWidth="210" Text="{Binding Password}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -431,76 +492,126 @@
                 </TextBox>
                 <Border Grid.Row="8" Height="1" BorderThickness="1" BorderBrush="#212a3b" Margin="0,10,0,10" Grid.ColumnSpan="2"/>
                 <TextBlock Grid.Row="9" Grid.Column="0" Text="Network Interface:" Foreground="#94a3b8" Margin="0,15,0,0"/>
-                <ComboBox Grid.Row="9" Grid.Column="1" Margin="0,10,0,5" Background="Transparent" Foreground="#94a3b8" BorderThickness="0" 
-                          SelectedValuePath="Content" Height="30" Width="301" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0">
+                <ComboBox SelectedValue="{Binding SelectNWInterface, Mode=TwoWay}"
+                          Grid.Row="9"
+                          Grid.Column="1"
+                          Margin="0,10,0,5"
+                          Background="Transparent"
+                          Foreground="#94a3b8" BorderThickness="0" 
+                          SelectedValuePath="Content" Height="30" Width="301" Style="{StaticResource ComboBoxStyle}" 
+                          ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0"
+                          PreviewMouseLeftButtonDown="ComboBox_PreviewMouseLeftButtonDown">
                     <ComboBoxItem Content="Default"/>
                     <ComboBoxItem Content="ethernet"/>
                 </ComboBox>
                 <TextBlock Grid.Row="10" Grid.Column="0" Text="Audio Codec:" VerticalAlignment="Center" Foreground="#94a3b8"/>
                 <StackPanel Grid.Row="10" Grid.Column="1" Orientation="Horizontal">
-                    <ComboBox Grid.Row="10" Grid.Column="1" Margin="0,10,0,5" Background="Transparent" Foreground="#94a3b8" BorderThickness="0" SelectedValuePath="Content" Height="30" MinWidth="208" Style="{StaticResource ComboBoxStyle}" ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0">
+                    <ComboBox SelectedValue="{Binding SelectedAudioCodec}" Grid.Row="10" Grid.Column="1" Margin="0,10,0,5" 
+                              Background="Transparent" Foreground="#94a3b8" BorderThickness="0" SelectedValuePath="Content" 
+                              Height="30" MinWidth="208" Style="{StaticResource ComboBoxStyle}" 
+                              ItemContainerStyle="{StaticResource CleanComboBoxItem}" SelectedIndex="0"
+                              PreviewMouseLeftButtonDown="ComboBox_PreviewMouseLeftButtonDown">
                         <ComboBoxItem Content="MP3 (128kbps)"/>
                         <ComboBoxItem Content="Ogg Vorbis (128kbps)"/>
                         <ComboBoxItem Content="Ogg Opus (128kbps)"/>
                     </ComboBox>
-                    <Button Content="Customize" Click="Customize_Click" Margin="5,10,0,5" Height="26" FontSize="12" Width="78" Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource HoverButtonStyle}"  />
+                    <Button Content="Customize" Click="Customize_Click" Margin="5,10,0,5" Height="26" FontSize="12" Width="78" 
+                            Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource HoverButtonStyle}"/>
                 </StackPanel>
-                <TextBlock Text="128 kbps MP3 (44100 Hz, Stereo)" Grid.Row="11" Grid.Column="1"  Foreground="#94a3b8"/>
-                <Button Grid.Row="12" Click="TestStream_Click" Grid.Column="1" HorizontalAlignment="Right" Content="Test Stream" Height="26" FontSize="12" Width="82" Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource HoverButtonStyle}"  />
+                <TextBlock Text="128 kbps MP3 (44100 Hz, Stereo)" Grid.Row="11" Grid.Column="1" Foreground="#94a3b8"/>
+                <Button Grid.Row="12" Click="TestStream_Click" Grid.Column="1" HorizontalAlignment="Right" Content="Test Stream" 
+                        Height="26" FontSize="12" Width="82" Cursor="Hand" Foreground="White" Background="#3498db" 
+                        Style="{StaticResource HoverButtonStyle}"/>
             </Grid>
         </Border>
+        <StackPanel Grid.Row="2" Grid.Column="1" Background="#0b1220" Orientation="Horizontal" 
+                    HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom">
+            <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Click="StreamsOK_Click"/>
+            <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Width="79" Margin="5,0,0,0" 
+                    Click="StreamsCancel_Click"/>
+        </StackPanel>
         <!--===========Modals===========-->
-        <Grid x:Name="StreamsMetaDataModal" Background="#88000000" Visibility="Collapsed" Panel.ZIndex="100" MouseDown="StreamsMetaDataModal_MouseDown" KeyDown="StreamsMetaDataModal_KeyDown" Grid.ColumnSpan="2" Margin="0,0,0,0">
+        <Grid x:Name="StreamsMetaDataModal" Background="#88000000" Visibility="{Binding StreamsMetaDataModalVisibility}" 
+              Panel.ZIndex="100" MouseDown="StreamsMetaDataModal_MouseDown" KeyDown="StreamsMetaDataModal_KeyDown" 
+              Grid.ColumnSpan="2" Grid.RowSpan="3" Margin="0,0,0,0">
             <Border HorizontalAlignment="Center" VerticalAlignment="Center" Height="337" Width="400" Padding="15" BorderThickness="1">
+                <Border.RenderTransform>
+                    <TranslateTransform X="{Binding StreamsMetaDataModalTransform.X}" Y="{Binding StreamsMetaDataModalTransform.Y}"/>
+                </Border.RenderTransform>
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <local:ModalHeader x:Name="ModalHeaderControl" Grid.Row="0" Title="Streams MetaData" CloseClicked="MetaDataStream_CloseClicked" Margin="0,-15,0,15"/>
+                    <local:ModalHeader x:Name="ModalHeaderControl" Grid.Row="0" Title="Streams MetaData" 
+                                       CloseClicked="MetaDataStream_CloseClicked" Margin="0,-15,0,15"
+                                       MouseLeftButtonDown="StreamsMetaDataModalHeader_MouseLeftButtonDown"
+                                       MouseMove="StreamsMetaDataModalHeader_MouseMove"
+                                       MouseLeftButtonUp="ModalHeader_MouseLeftButtonUp"/>
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,15,0,0" Grid.RowSpan="2">
                         <local:StreamMetadata x:Name="StreamsMetaDataControl"/>
                     </ScrollViewer>
-                    <StackPanel Background="#06122b" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,-10,10,0">
+                    <StackPanel Background="#06122b" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" 
+                                VerticalAlignment="Center" Margin="0,-10,10,0">
                         <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Click="MetaDataOK_Click"/>
-                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Click="MetaDataCancel_Click" Height="26" Width="79" Margin="5,0,0,0"/>
+                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Width="79" 
+                                Margin="5,0,0,0" Click="MetaDataCancel_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
-        <Grid x:Name="EncoderSettingModal" Background="#88000000" Visibility="Collapsed" Panel.ZIndex="100" Grid.ColumnSpan="2" Margin="0,0,0,0">
+        <Grid x:Name="EncoderSettingModal" Background="#88000000" Visibility="{Binding EncoderSettingModalVisibility}" 
+              Panel.ZIndex="100" Grid.ColumnSpan="2" Grid.RowSpan="3" Margin="0,0,0,0">
             <Border HorizontalAlignment="Center" VerticalAlignment="Center" Height="260" Width="324" Padding="15" BorderThickness="1">
-                <Grid  Background="#06122b">
+                <Border.RenderTransform>
+                    <TranslateTransform X="{Binding EncoderSettingModalTransform.X}" Y="{Binding EncoderSettingModalTransform.Y}"/>
+                </Border.RenderTransform>
+                <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="10"/>
                     </Grid.RowDefinitions>
-                    <local:ModalHeader Grid.Row="0" Title="Encoder Settings" CloseClicked="EncoderSettings_CloseClicked" Margin="0,-15,0,15"/>
+                    <local:ModalHeader Grid.Row="0" Title="Encoder Settings" CloseClicked="EncoderSettings_CloseClicked" 
+                                       Margin="0,-15,0,15" MouseLeftButtonDown="EncoderSettingModalHeader_MouseLeftButtonDown"
+                                       MouseMove="EncoderSettingModalHeader_MouseMove"
+                                       MouseLeftButtonUp="ModalHeader_MouseLeftButtonUp"/>
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,15,0,0" Grid.RowSpan="2">
                         <local:EncoderSettings x:Name="EncoderSettingControl"/>
                     </ScrollViewer>
-                    <StackPanel Background="#06122b" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,-40,10,0">
+                    <StackPanel Background="#06122b" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" 
+                                VerticalAlignment="Center" Margin="0,-40,10,0">
                         <Button Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Width="79" Click="EncoderSettingOK_Click"/>
-                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Click="EncoderSettingCancel_Click" Height="26" Width="79" Margin="5,0,0,0"/>
+                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Width="79" 
+                                Margin="5,0,0,0" Click="EncoderSettingCancel_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
-        <Grid x:Name="StreamDiagnosticModal" Background="#88000000" Visibility="Collapsed"  Panel.ZIndex="100" Grid.ColumnSpan="2" Margin="0,0,0,0">
-            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Height="430" Width="350" Padding="15" BorderThickness="1" >
+        <Grid x:Name="StreamDiagnosticModal" Background="#88000000" Visibility="{Binding StreamDiagnosticModalVisibility}" 
+              Panel.ZIndex="100" Grid.ColumnSpan="2" Grid.RowSpan="3" Margin="0,0,0,0">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Height="430" Width="350" Padding="15" BorderThickness="1">
+                <Border.RenderTransform>
+                    <TranslateTransform X="{Binding StreamDiagnosticModalTransform.X}" Y="{Binding StreamDiagnosticModalTransform.Y}"/>
+                </Border.RenderTransform>
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition/>
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
-                    <local:ModalHeader Grid.Row="0" Title="Stream Diagnostic" CloseClicked="StreamDiagnostic_CloseClicked" />
-                    <local:StreamDiagnostic Grid.Row="1" x:Name="StreamDiagnosticControl" Grid.RowSpan="2" />
-                    <StackPanel Background="#06122b" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="158,0,0,0" Height="26" Width="150">
-                        <Button Content="Retry" Height="26" FontSize="12" Width="70" Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource DarkButtonStyle}" Margin="0,0,10,0"/>
-                        <Button Content="Close" Click="Close_Click" Height="26" FontSize="12" Width="70" Cursor="Hand" Foreground="White" Background="#3498db" Style="{StaticResource DarkButtonStyle}"/>
+                    <local:ModalHeader Grid.Row="0" Title="Stream Diagnostic" CloseClicked="StreamDiagnostic_CloseClicked"
+                                       MouseLeftButtonDown="StreamDiagnosticModalHeader_MouseLeftButtonDown"
+                                       MouseMove="StreamDiagnosticModalHeader_MouseMove"
+                                       MouseLeftButtonUp="ModalHeader_MouseLeftButtonUp"/>
+                    <local:StreamDiagnostic Grid.Row="1" x:Name="StreamDiagnosticControl" Grid.RowSpan="2"/>
+                    <StackPanel Background="#06122b" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" 
+                                VerticalAlignment="Center" Margin="158,0,0,0" Height="26" Width="150">
+                        <Button Content="Retry" Height="26" FontSize="12" Width="70" Cursor="Hand" Foreground="White" 
+                                Background="#3498db" Style="{StaticResource DarkButtonStyle}" Margin="0,0,10,0" Click="Retry_Click"/>
+                        <Button Content="Close" Click="Close_Click" Height="26" FontSize="12" Width="70" Cursor="Hand" 
+                                Foreground="White" Background="#3498db" Style="{StaticResource DarkButtonStyle}"/>
                     </StackPanel>
                 </Grid>
             </Border>

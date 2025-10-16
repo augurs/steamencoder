@@ -462,7 +462,7 @@
                                             </Setter>
                                         </Style>
                                     </ScrollViewer.Resources>
-                                    <ItemsControl ItemsSource="{Binding Streams}">
+                                    <ItemsControl ItemsSource="{Binding AllStreams}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                                 <Border BorderBrush="#212a3b" Height="60" BorderThickness="1" Background="#0b1220"
@@ -475,7 +475,12 @@
                                                         </Grid.ColumnDefinitions>
                                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                             <TextBlock Text="{Binding Name}" Foreground="#94a3b8" FontSize="14" FontWeight="SemiBold"/>
-                                                            <TextBlock Text="{Binding Mount}" Foreground="#94a3b8" FontSize="12" Margin="0,2,0,0"/>
+                                                            <TextBlock 
+                                                                    Text="{Binding Mount, StringFormat=Mount:/ {0}}" 
+                                                                    Foreground="#94a3b8" 
+                                                                    FontSize="12" 
+                                                                    Margin="0,2,0,0"/>
+
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                                                     VerticalAlignment="Center" Grid.Column="1" Margin="10,0,0,0">
@@ -616,82 +621,75 @@
             </Grid>
         </Grid>
         <!--=========Modals==========-->
-        <Grid x:Name="PreferencesModalOverlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
-            <Grid.RenderTransform>
-                <TranslateTransform x:Name="OverlayTransform" />
-            </Grid.RenderTransform>
-            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" Width="680" Padding="0" BorderBrush="#0b1220" BorderThickness="1">
+        <Grid x:Name="PreferencesModalOverlay" 
+              Background="#B2000000" 
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch" 
+              Visibility="Collapsed">
+            <Border HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    Background="White" 
+                    Width="680" 
+                    Padding="0" 
+                    BorderBrush="#0b1220" 
+                    BorderThickness="1">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="OverlayTransform" />
+                </Border.RenderTransform>
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="45"/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Background="#0b1220" MouseLeftButtonDown="Header_MouseLeftButtonDown" MouseMove="Header_MouseMove" MouseLeftButtonUp="Header_MouseLeftButtonUp">
-                       <local:ModalHeader Title="Preferences" CloseClicked="PreferencesHeader_CloseClicked"/>
+                    <Grid Grid.Row="0" 
+                          Background="#0b1220"
+                          MouseLeftButtonDown="Header_MouseLeftButtonDown"
+                          MouseMove="Header_MouseMove"
+                          MouseLeftButtonUp="Header_MouseLeftButtonUp">
+                        <local:ModalHeader Title="Preferences" 
+                                   CloseClicked="PreferencesHeader_CloseClicked"/>
                     </Grid>
                     <local:AudioPreferences x:Name="Preferences" Grid.Row="1"/>
-                    <StackPanel Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,5,0" Height="45">
-                        <Button x:Name="okPreferncesbtn" Content="OK" Style="{StaticResource DarkButtonStyle}" Height="26" Click="ok_click"/>
-                        <Button x:Name="cancelPreferncesbtn" Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" Height="26" Margin="5,0,5,0" Click="cancel_Click"/>
-                        <Button x:Name="applyPrefencecsbtn" Content="Apply" Style="{StaticResource DarkButtonStyle}" Height="26" Margin="0,0,5,0" Click="Apply_click"/>
+                    <StackPanel Grid.Row="2" 
+                                VerticalAlignment="Bottom" 
+                                HorizontalAlignment="Right" 
+                                Orientation="Horizontal" 
+                                Margin="0,5,5,0" 
+                                Height="45">
+                        <Button x:Name="okPreferncesbtn" 
+                                Content="OK" 
+                                Style="{StaticResource DarkButtonStyle}" 
+                                Height="26" 
+                                Click="ok_click"/>
+                        <Button x:Name="cancelPreferncesbtn" 
+                                Content="Cancel" 
+                                Style="{StaticResource DarkCancelButtonStyle}" 
+                                Height="26" 
+                                Margin="5,0,5,0" 
+                                Click="cancel_Click"/>
+                        <Button x:Name="applyPrefencecsbtn" 
+                                Content="Apply" 
+                                Style="{StaticResource DarkButtonStyle}" 
+                                Height="26" 
+                                Margin="0,0,5,0" 
+                                Click="Apply_click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
-
         <Grid x:Name="StreamsModalOverlay" 
+              Background="#B2000000"
               HorizontalAlignment="Stretch" 
               VerticalAlignment="Stretch" 
               Visibility="Collapsed">
-            <Grid.RenderTransform>
-                <TranslateTransform x:Name="StreamsOverlayTransform"/>
-            </Grid.RenderTransform>
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsVisible}" Value="True">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-
-            <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
-                    Background="#0b1220" Width="750" Padding="0" 
-                    BorderBrush="#0b1220" BorderThickness="1">
-                <Grid Background="#06122b">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Background="#0b1220"
-                          MouseLeftButtonDown="StreamsHeader_MouseLeftButtonDown"
-                          MouseMove="StreamsHeader_MouseMove"
-                          MouseLeftButtonUp="StreamsHeader_MouseLeftButtonUp">
-                        <local:ModalHeader Title="Streams" CloseClicked="StreamsHeader_CloseClicked"/>
-                    </Grid>
-                    <local:Streams x:Name="StreamsControl" Grid.Row="1"/>
-                    <StackPanel Background="#0b1220" Grid.Row="2" Orientation="Horizontal" 
-                        HorizontalAlignment="Right" VerticalAlignment="Center" 
-                        Margin="0,-10,10,0">
-                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" 
-                        Height="26" Width="79" Click="StreamsOK_Click"/>
-                        <Button Content="Cancel" Style="{StaticResource DarkCancelButtonStyle}" 
-                        Click="StreamsCancel_Click" Height="26" Width="79" Margin="5,0,0,0"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+            <ContentControl x:Name="StreamsDataContent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         <Grid x:Name="AboutModalOverlay" 
               HorizontalAlignment="Stretch" 
               VerticalAlignment="Stretch" 
+              Background="#B2000000"
               Visibility="Collapsed">
-            <Grid.RenderTransform>
-                <TranslateTransform x:Name="AboutOverlayTransform"/>
-            </Grid.RenderTransform>
 
             <Grid.Style>
                 <Style TargetType="Grid">
@@ -704,9 +702,20 @@
                 </Style>
             </Grid.Style>
 
-            <Border HorizontalAlignment="Center" VerticalAlignment="Center" 
-                    Background="#0b1220" Width="350" Padding="0" 
-                    BorderBrush="#0b1220" BorderThickness="0">
+            <!-- Modal Box -->
+            <Border HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="#0b1220"
+            Width="350"
+            Padding="0"
+            BorderBrush="#0b1220"
+            BorderThickness="0">
+
+                <!-- Move transform here -->
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="AboutOverlayTransform"/>
+                </Border.RenderTransform>
+
                 <Grid Background="#06122b">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
@@ -714,25 +723,34 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Background="#0b1220"
-                          MouseLeftButtonDown="AboutHeader_MouseLeftButtonDown"
-                          MouseMove="AboutHeader_MouseMove"
-                          MouseLeftButtonUp="AboutHeader_MouseLeftButtonUp">
+                    <Grid Grid.Row="0"
+                  Background="#0b1220"
+                  MouseLeftButtonDown="AboutHeader_MouseLeftButtonDown"
+                  MouseMove="AboutHeader_MouseMove"
+                  MouseLeftButtonUp="AboutHeader_MouseLeftButtonUp">
                         <local:ModalHeader Title="About" CloseClicked="AboutHeader_CloseClicked"/>
                     </Grid>
+
                     <local:About x:Name="AboutsControl" Grid.Row="1"/>
-                    <StackPanel Background="#0b1220" Grid.Row="2" Orientation="Horizontal" 
-                        HorizontalAlignment="Right" VerticalAlignment="Center" 
+
+                    <StackPanel Background="#0b1220"
+                        Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
                         Margin="0,-10,10,0">
-                        <Button Content="OK" Style="{StaticResource DarkButtonStyle}" 
-                        Height="26" Width="79" Click="AboutOK_Click"/>
+                        <Button Content="OK"
+                        Style="{StaticResource DarkButtonStyle}"
+                        Height="26"
+                        Width="79"
+                        Click="AboutOK_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
-        <!--<Grid x:Name="MetaDataFadeOverlay" Background="#B2000000" Visibility="Collapsed">
-     
-  </Grid>-->
-        <ContentControl x:Name="MetaDataContent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Grid x:Name="MetaDataFadeOverlay" Background="#B2000000" Visibility="Collapsed">
+            <ContentControl x:Name="MetaDataContent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+       
     </Grid>
 </Window>

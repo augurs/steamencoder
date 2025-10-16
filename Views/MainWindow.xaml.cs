@@ -21,8 +21,9 @@ namespace EncoderApp.Views
     public partial class MainWindow : Window
     {
         private AudioDevicesScreenViewModel _audioDevicesViewModel;
+        private StreamingViewModel _streamingViewModel;
         public ObservableCollection<StreamInfo> Streams { get; set; } = new ObservableCollection<StreamInfo>();
-
+        public ObservableCollection<StreamModel> AllStreams { get; set; } = new ObservableCollection<StreamModel>();
         private bool _isCustomMaximized = false;
         private Rect _restoreBounds;
 
@@ -59,12 +60,13 @@ namespace EncoderApp.Views
                 UpdateAudioDbText(audioInputSliderValue);
                 UpdateOtherAppsDbText(otherAppsSliderValue);
                 Streams.Clear();
-                AppConfigurationManager.LoadStreamsIntoCollection(Streams);
+               // AppConfigurationManager.LoadStreamsIntoCollection(Streams);
+                AppConfigurationManager.LoadStreamsIntoCollection(AllStreams);
                 CreateBlocks();
                 InitAudio();
                 OtherAppAudioCaptureService.Instance.OnVolumeChanged += OnSystemVolumeChanged;
                 AudioInputCaptureService.Instance.OnError += OnAudioInputError;
-             
+              
             }
             catch (Exception ex)
             {
@@ -174,7 +176,7 @@ namespace EncoderApp.Views
         #region Streams
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Border border && border.DataContext is StreamInfo stream)
+            if (sender is Border border && border.DataContext is StreamModel stream)
             {
                 bool isConnected = stream.IsConnected;
                 streamONText.Text = stream.Name;
@@ -183,22 +185,15 @@ namespace EncoderApp.Views
                 streamOFFText.Text = stream.Name;
                 OffAirPanel.Visibility = isConnected ? Visibility.Collapsed : Visibility.Visible;
                 Errorpanel.Visibility = Visibility.Collapsed;
-                if (stream.IsError == true)
-                {
-                    OnAirPanel.Visibility = Visibility.Collapsed;
-                    OffAirPanel.Visibility = Visibility.Collapsed;
-                    Errorpanel.Visibility = Visibility.Visible;
-                }
+                //if (stream.IsError == true)
+                //{
+                //    OnAirPanel.Visibility = Visibility.Collapsed;
+                //    OffAirPanel.Visibility = Visibility.Collapsed;
+                //    Errorpanel.Visibility = Visibility.Visible;
+                //}
             }
         }
-        private void StreamsCancel_Click(object sender, RoutedEventArgs e)
-        {
-            StreamsModalOverlay.Visibility = Visibility.Collapsed;
-        }
-        private void StreamsOK_Click(object sender, RoutedEventArgs e)
-        {
-            StreamsModalOverlay.Visibility = Visibility.Collapsed;
-        }
+ 
         #endregion
 
         #region Preferences
@@ -262,6 +257,12 @@ namespace EncoderApp.Views
 
             StopButton.IsEnabled = true;
             StopButton.Opacity = 1;
+            if (_streamingViewModel == null)
+                _streamingViewModel = new StreamingViewModel();
+
+            _streamingViewModel.StartStreaming();
+
+
         }
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
@@ -270,6 +271,7 @@ namespace EncoderApp.Views
 
             StartButton.IsEnabled = true;
             StartButton.Opacity = 1;
+            _streamingViewModel.StopStreaming();
         }
         #endregion
 
@@ -321,34 +323,7 @@ namespace EncoderApp.Views
 
         private Point _aboutStartPoint;
         private bool _isAboutDragging = false;
-
-        private void StreamsHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            _streamsStartPoint = e.GetPosition(null);
-            _isStreamsDragging = true;
-            (sender as UIElement).CaptureMouse();
-        }
-
-        private void StreamsHeader_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isStreamsDragging)
-            {
-                Point currentPoint = e.GetPosition(null);
-                double offsetX = currentPoint.X - _streamsStartPoint.X;
-                double offsetY = currentPoint.Y - _streamsStartPoint.Y;
-
-                StreamsOverlayTransform.X += offsetX;
-                StreamsOverlayTransform.Y += offsetY;
-
-                _streamsStartPoint = currentPoint;
-            }
-        }
-
-        private void StreamsHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            _isStreamsDragging = false;
-            (sender as UIElement).ReleaseMouseCapture();
-        }
+    
         private void AboutHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _aboutStartPoint = e.GetPosition(null);
@@ -451,12 +426,55 @@ namespace EncoderApp.Views
         {
             PreferencesModalOverlay.Visibility = Visibility.Collapsed;
         }
-
         private void Streams_Click(object sender, RoutedEventArgs e)
         {
-            StreamsModalOverlay.Visibility = Visibility.Visible;
+            if (StreamsDataContent.Content == null)
+            {
+                var dataCaptureControl = new Streams();
+                if (dataCaptureControl.DataContext is StreamsViewModel streamsViewModel)
+                {
+                    streamsViewModel.StreamAdded += StreamsViewModel_StreamAdded;
+                }
+                dataCaptureControl.CloseClicked += (s, args) =>
+                {
+                    if (dataCaptureControl.DataContext is StreamsViewModel streamsViewModel)
+                    {
+                        streamsViewModel.StreamAdded -= StreamsViewModel_StreamAdded;
+                    }
+                    StreamsDataContent.Content = null;
+                    StreamsModalOverlay.Visibility = Visibility.Collapsed;
+                };
+                StreamsDataContent.Content = dataCaptureControl;
+                StreamsModalOverlay.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                if (StreamsDataContent.Content is Streams streamsControl && streamsControl.DataContext is StreamsViewModel streamsViewModel)
+                {
+                    streamsViewModel.StreamAdded -= StreamsViewModel_StreamAdded;
+                }
+                StreamsDataContent.Content = null;
+                StreamsModalOverlay.Visibility = Visibility.Collapsed;
+            }
         }
 
+        private void StreamsViewModel_StreamAdded(object sender, EventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    AllStreams.Clear();
+                    AppConfigurationManager.LoadStreamsIntoCollection(AllStreams);
+                    CustomMessageBox.ShowInfo($"Refreshed AllStreams ({AllStreams.Count} items)","Success");
+               
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex);
+                }
+            });
+        }
         private void StreamsHeader_CloseClicked(object sender, RoutedEventArgs e)
         {
             StreamsModalOverlay.Visibility = Visibility.Collapsed;
@@ -473,10 +491,10 @@ namespace EncoderApp.Views
                 dataCaptureControl.CloseClicked += (s, args) =>
                 {
                     MetaDataContent.Content = null;
-                    //  MetaDataFadeOverlay.Visibility = Visibility.Collapsed;
+                     MetaDataFadeOverlay.Visibility = Visibility.Collapsed;
                 };
                 MetaDataContent.Content = dataCaptureControl;
-                //  MetaDataFadeOverlay.Visibility = Visibility.Visible;
+                 MetaDataFadeOverlay.Visibility = Visibility.Visible;
             }
             else
             {
@@ -608,7 +626,6 @@ namespace EncoderApp.Views
                 CustomMessageBox.ShowInfo($"Failed to load speaker icon: {ex.Message}", "Error");
             }
 
-            // UI updates on main thread
             if (_isMasterMuted)
             {
                 AudioSlider.Value = 0;
@@ -627,7 +644,6 @@ namespace EncoderApp.Views
                 OtherAppsSlider.IsEnabled = true;
             }
 
-            // Background for heavy ops
             _ = Task.Run(() =>
             {
                 try
@@ -686,7 +702,6 @@ namespace EncoderApp.Views
              
             }
         }
-       
 
         private void OtherAppsSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -896,6 +911,7 @@ namespace EncoderApp.Views
                 micCapture?.StopRecording();
                 await Task.Delay(100);  
                 micCapture?.Dispose();
+               _streamingViewModel.StopStreaming();
                 micCapture = null;
             }
             catch (Exception ex)

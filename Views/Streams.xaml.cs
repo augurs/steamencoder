@@ -1,137 +1,244 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using EncoderApp.ViewModels;
 
 namespace EncoderApp.Views
 {
-    /// <summary>
-    /// Interaction logic for Streams.xaml
-    /// </summary>
     public partial class Streams : UserControl
     {
+        private readonly StreamsViewModel viewModel;
+
+        public event RoutedEventHandler CloseClicked;
+
         public Streams()
         {
             InitializeComponent();
+            viewModel = new StreamsViewModel();
+            DataContext = viewModel;
+            viewModel.CloseRequested += ViewModel_CloseRequested;
         }
         private void ComboBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is ComboBox comboBox)
             {
-                comboBox.Focus();
-                comboBox.IsDropDownOpen = true;
-                e.Handled = true;
-            }
+                var popup = comboBox.Template.FindName("Popup", comboBox) as System.Windows.Controls.Primitives.Popup;
+                if (popup != null && popup.IsOpen)
+                {
+                    if (popup.IsMouseOver)
+                        return;
+                    e.Handled = true;
+                    comboBox.IsDropDownOpen = false;
+                    return;
+                }
 
-        }
-        private void StreamNameTxt_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (StreamNameTxt.Text == "My Radio Station")
-            {
-                StreamNameTxt.Text = "";
-                StreamNameTxt.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94a3b8"));
+                if (!comboBox.IsDropDownOpen)
+                {
+                    e.Handled = true;
+                    comboBox.Focus();
+                    comboBox.IsDropDownOpen = true;
+                }
             }
         }
-        private void StreamNameTxt_LostFocus(object sender, RoutedEventArgs e)
+        private void ViewModel_CloseRequested(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(StreamNameTxt.Text))
-            {
-                StreamNameTxt.Text = "My Radio Station";
-                StreamNameTxt.Foreground = Brushes.LightGray;
-            }
+            CloseClicked?.Invoke(this, new RoutedEventArgs());
+            Visibility = Visibility.Collapsed;
+        }
+
+        private void Header_CloseClicked(object sender, RoutedEventArgs e)
+        {
+            viewModel.Close();
+        }
+
+        private void StreamsOK_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.SaveAndClose();
+        }
+
+        private void StreamsCancel_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.CancelNewStream();
+            viewModel.Close();
         }
 
         private void Advanced_Click(object sender, RoutedEventArgs e)
         {
-            StreamsMetaDataModal.Visibility = Visibility.Visible;
+            viewModel.ShowStreamsMetaDataModal();
         }
+
         private void Customize_Click(object sender, RoutedEventArgs e)
         {
-            EncoderSettingModal.Visibility = Visibility.Visible;
-        }
-        
-        private void MetaDataStream_CloseClicked(object sender, RoutedEventArgs e)
-        {
-            StreamsMetaDataModal.Visibility = Visibility.Collapsed;
-        } 
-        private void EncoderSettings_CloseClicked(object sender, RoutedEventArgs e)
-        {
-            EncoderSettingModal.Visibility = Visibility.Collapsed;
-        }
-        private void StreamDiagnostic_CloseClicked(object sender, RoutedEventArgs e)
-        {
-            StreamDiagnosticModal.Visibility = Visibility.Collapsed;
-        }
-        
-        private void StreamsMetaDataModal_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.OriginalSource == StreamsMetaDataModal)
-            {
-                StreamsMetaDataModal.Visibility = Visibility.Collapsed;
-            }
-        }
-        private void StreamsMetaDataModal_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                StreamsMetaDataModal.Visibility = Visibility.Collapsed;
-            }
+            viewModel.ShowEncoderSettingModal();
         }
 
         private void TestStream_Click(object sender, RoutedEventArgs e)
         {
-            StreamDiagnosticModal.Visibility = Visibility.Visible;
+            viewModel.ShowStreamDiagnosticModal();
         }
-        private void MetaDataCancel_Click(object sender, RoutedEventArgs e)
-        {
-            StreamsMetaDataModal.Visibility = Visibility.Collapsed;
-        }
+
         private void MetaDataOK_Click(object sender, RoutedEventArgs e)
         {
-            StreamsMetaDataModal.Visibility = Visibility.Collapsed;
+            viewModel.HideStreamsMetaDataModal();
+        }
+
+        private void MetaDataCancel_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.HideStreamsMetaDataModal();
         }
 
         private void EncoderSettingOK_Click(object sender, RoutedEventArgs e)
         {
-            EncoderSettingModal.Visibility = Visibility.Collapsed;
+            viewModel.HideEncoderSettingModal();
         }
+
         private void EncoderSettingCancel_Click(object sender, RoutedEventArgs e)
         {
-            EncoderSettingModal.Visibility = Visibility.Collapsed;
+            viewModel.HideEncoderSettingModal();
         }
-        
+
+        private void MetaDataStream_CloseClicked(object sender, RoutedEventArgs e)
+        {
+            viewModel.HideStreamsMetaDataModal();
+        }
+
+        private void EncoderSettings_CloseClicked(object sender, RoutedEventArgs e)
+        {
+            viewModel.HideEncoderSettingModal();
+        }
+
+        private void StreamDiagnostic_CloseClicked(object sender, RoutedEventArgs e)
+        {
+            viewModel.HideStreamDiagnosticModal();
+        }
+
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            StreamDiagnosticModal.Visibility = Visibility.Collapsed;
+            viewModel.HideStreamDiagnosticModal();
+        }
+
+        private void Retry_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.ShowStreamDiagnosticModal();
+        }
+
+        private void AddNewStream_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.AddNewStream();
+        }
+
+        private void RemoveStream_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.RemoveStream();
+        }
+
+        private void CloneStream_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.CloneStream();
         }
 
         private void IncrementPort_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(portTextBox.Text, out int port))
-            {
-                port++; 
-                portTextBox.Text = port.ToString();
-            }
+            viewModel.IncrementPort();
         }
 
         private void DecrementPort_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(portTextBox.Text, out int port))
-            {
-                port--; 
-                portTextBox.Text = port.ToString();
-            }
+            viewModel.DecrementPort();
         }
 
+        private void StreamNameTxt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.StreamNameGotFocus();
+        }
+
+        private void StreamNameTxt_LostFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.StreamNameLostFocus();
+        }
+        private void HostNameTxt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.HostNameGotFocus();
+        }
+
+        private void HostNameTxt_LostFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.HostNameLostFocus();
+        }
+        private void MountTxt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.MountGotFocus();
+        }
+
+        private void MountTxt_LostFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.MountLostFocus();
+        }
+        private void UserNameTxt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.UserNameGotFocus();
+        }
+
+        private void UserNameTxt_LostFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.UserNameLostFocus();
+        }
+        private void Pass_GotFoucs(object sender, RoutedEventArgs e)
+        {
+            viewModel.PassGotFoucs();
+        }
+
+        private void Pass_LostFocus(object sender, RoutedEventArgs e)
+        {
+            viewModel.PassLostFocus();
+        }
+        
+      
+
+        private void StreamsMetaDataModalHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.ModalHeaderMouseLeftButtonDown(sender, e, "StreamsMetaDataModal");
+        }
+
+        private void StreamsMetaDataModalHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            viewModel.ModalHeaderMouseMove(sender, e, "StreamsMetaDataModal");
+        }
+
+        private void EncoderSettingModalHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.ModalHeaderMouseLeftButtonDown(sender, e, "EncoderSettingModal");
+        }
+
+        private void EncoderSettingModalHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            viewModel.ModalHeaderMouseMove(sender, e, "EncoderSettingModal");
+        }
+
+        private void StreamDiagnosticModalHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.ModalHeaderMouseLeftButtonDown(sender, e, "StreamDiagnosticModal");
+        }
+
+        private void StreamDiagnosticModalHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            viewModel.ModalHeaderMouseMove(sender, e, "StreamDiagnosticModal");
+        }
+
+        private void ModalHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.ModalHeaderMouseLeftButtonUp(sender, e);
+        }
+
+        private void StreamsMetaDataModal_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.StreamsMetaDataModalMouseDown(sender, e);
+        }
+
+        private void StreamsMetaDataModal_KeyDown(object sender, KeyEventArgs e)
+        {
+            viewModel.StreamsMetaDataModalKeyDown(sender, e);
+        }
     }
 }

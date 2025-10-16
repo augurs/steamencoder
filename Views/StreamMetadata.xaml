@@ -70,7 +70,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Border BorderBrush="#212a3b" Grid.Row="0" CornerRadius="4" Height="230" Background="#131d2f" BorderThickness="1" Padding="10" VerticalAlignment="Top">
+        <Border BorderBrush="#212a3b" Grid.Row="0" CornerRadius="4" Height="215" Background="#131d2f" BorderThickness="1" Padding="10" VerticalAlignment="Top">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -88,31 +88,31 @@
                     <Image Source="/Images/stream.png" Width="25" Height="35" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <TextBlock Text="Additional Stream Metadata" Foreground="#3498db" FontSize="20" VerticalAlignment="Center"/>
                 </StackPanel>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Genre:" Style="{StaticResource TextBlockStyle}"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="genere" Style="{StaticResource TextBoxStyle}" BorderThickness="0"  Background="#0b1220">
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Genre:" Style="{StaticResource TextBlockStyle}" Margin="0,5,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="genere" Style="{StaticResource TextBoxStyle}" BorderThickness="0"  Background="#0b1220" Margin="0,0,0,11">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
                         </Style>
                     </TextBox.Resources>
                 </TextBox>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Description:" Style="{StaticResource TextBlockStyle}"/>
-                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource TextBoxStyle}"  BorderThickness="0"  Background="#0b1220">
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Description:" Style="{StaticResource TextBlockStyle}" Margin="0,5,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource TextBoxStyle}"  BorderThickness="0"  Background="#0b1220" Margin="0,0,0,11">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
                         </Style>
                     </TextBox.Resources>
                 </TextBox>
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Website URL:" Style="{StaticResource TextBlockStyle}"/>
-                <TextBox Grid.Row="3" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="http://www.mywebsite.com" BorderThickness="0"  Background="#0b1220">
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Website URL:" Style="{StaticResource TextBlockStyle}" Margin="0,5,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="http://www.mywebsite.com" BorderThickness="0"  Background="#0b1220" Margin="0,0,0,13">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
                         </Style>
                     </TextBox.Resources>
                 </TextBox>
-                <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Content="Private stream" Foreground="#94a3b8" Margin="0,15,0,0" VerticalAlignment="Center"/>
+                <CheckBox Grid.Row="4" Grid.ColumnSpan="2" Content="Private stream" Foreground="#94a3b8" VerticalAlignment="Center"/>
             </Grid>
         </Border>
     </Grid>

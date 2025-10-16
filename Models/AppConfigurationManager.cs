@@ -161,5 +161,90 @@ namespace EncoderApp.Models
                 Debug.WriteLine($"Error loading streams: {ex.Message}");
             }
         }
+        public static void LoadStreamsIntoCollection(ObservableCollection<StreamModel> streams)
+        {
+            if (streams == null) throw new ArgumentNullException(nameof(streams));
+
+            try
+            {
+                _lock.EnterReadLock();
+                if (!File.Exists(_streamsFilePath))
+                {
+                    streams.Clear();
+                    streams.Add(new StreamModel { Name = "Test Stream", Mount = "Mount:/test", IsConnected = true });
+                    SaveStreamsToFile(streams);
+                    return;
+                }
+
+                XDocument doc = XDocument.Load(_streamsFilePath);
+                var rootElement = doc.Element("Data");
+                if (rootElement == null)
+                {
+                    streams.Clear();
+                    return;
+                }
+
+                var streamElements = rootElement.Elements("Stream");
+                if (!streamElements.Any())
+                {
+                    streams.Clear();
+                    return;
+                }
+
+                streams.Clear();
+                foreach (var streamElement in streamElements)
+                {
+                    var stream = new StreamModel
+                    {
+                        Name = streamElement.Element("Name")?.Value ?? "Unknown",
+                        ServerType = streamElement.Element("ServerType")?.Value ?? "IceCast 2",
+                        HostNameOrIP = streamElement.Element("HostNameOrIP")?.Value ?? "",
+                        Port = int.TryParse(streamElement.Element("Port")?.Value, out int port) ? port : 8000,
+                        Mount = streamElement.Element("Mount")?.Value ?? "",
+                        UserName = streamElement.Element("UserName")?.Value ?? "",
+                        Password = streamElement.Element("Password")?.Value ?? "",
+                        AudioCodec = streamElement.Element("AudioCodec")?.Value ?? "MP3 (128kbps)",
+                        SelectNWInterface = streamElement.Element("SelectNWInterface")?.Value ?? "Default"
+              
+                    };
+                    streams.Add(stream);
+                }
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+
+        public static void SaveStreamsToFile(ObservableCollection<StreamModel> streams)
+        {
+            if (streams == null) throw new ArgumentNullException(nameof(streams));
+
+            try
+            {
+                _lock.EnterWriteLock();
+                XDocument doc = new XDocument(new XElement("Data"));
+                var root = doc.Root;
+                foreach (var stream in streams)
+                {
+                    root?.Add(new XElement("Stream",
+                        new XElement("Name", stream.Name),
+                        new XElement("ServerType", stream.ServerType),
+                        new XElement("HostNameOrIP", stream.HostNameOrIP),
+                        new XElement("Port", stream.Port),
+                        new XElement("Mount", stream.Mount),
+                        new XElement("UserName", stream.UserName),
+                        new XElement("Password", stream.Password),
+                        new XElement("AudioCodec", stream.AudioCodec),
+                        new XElement("SelectNWInterface", stream.SelectNWInterface)
+                    ));
+                }
+                doc.Save(_streamsFilePath);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
     }
 }
