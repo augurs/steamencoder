@@ -42,7 +42,7 @@ namespace EncoderApp.Views
         private DateTime _lastMicUpdate = DateTime.MinValue;
         private DateTime _lastAppUpdate = DateTime.MinValue;
         private DateTime _lastSystemAudioUpdate = DateTime.MinValue;
-
+        string icecastUrl = "http://cast.streamkast.co:9090/augursTest1";
         public MainWindow()
         {
             try
@@ -178,6 +178,7 @@ namespace EncoderApp.Views
         {
             if (sender is Border border && border.DataContext is StreamModel stream)
             {
+                icecastUrl = $"http://{stream.HostNameOrIP}:{stream.Port}/{stream.Mount}";
                 bool isConnected = stream.IsConnected;
                 streamONText.Text = stream.Name;
                 OnAirPanel.Visibility = isConnected ? Visibility.Visible : Visibility.Collapsed;
@@ -185,6 +186,11 @@ namespace EncoderApp.Views
                 streamOFFText.Text = stream.Name;
                 OffAirPanel.Visibility = isConnected ? Visibility.Collapsed : Visibility.Visible;
                 Errorpanel.Visibility = Visibility.Collapsed;
+
+
+
+
+
                 //if (stream.IsError == true)
                 //{
                 //    OnAirPanel.Visibility = Visibility.Collapsed;
@@ -260,7 +266,7 @@ namespace EncoderApp.Views
             if (_streamingViewModel == null)
                 _streamingViewModel = new StreamingViewModel();
 
-            _streamingViewModel.StartStreaming();
+            _streamingViewModel.StartStreaming(icecastUrl);
 
 
         }

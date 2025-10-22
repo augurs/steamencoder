@@ -73,7 +73,7 @@ namespace EncoderApp.ViewModels
                 return read;
             }
         }
-        public void StartStreaming()
+        public void StartStreaming(string iceCastUrlive="")
         {
             if (isStreaming)
             {
@@ -84,7 +84,8 @@ namespace EncoderApp.ViewModels
 
             try
             {
-                string icecastUrl = "http://cast.streamkast.co:9090/augursTest1";
+                string icecastUrl = "";
+                icecastUrl = iceCastUrlive;
                 string sourcePassword = "Aa_3o2$8E";
                 CustomMessageBox.ShowInfo("Connecting to Icecast...", "Success");
                 //SetStatus("Connecting to Icecast...", "Yellow");
