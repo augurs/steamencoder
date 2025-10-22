@@ -178,7 +178,6 @@ namespace EncoderApp.Views
         {
             if (sender is Border border && border.DataContext is StreamModel stream)
             {
-                icecastUrl = $"http://{stream.HostNameOrIP}:{stream.Port}/{stream.Mount}";
                 bool isConnected = stream.IsConnected;
                 streamONText.Text = stream.Name;
                 OnAirPanel.Visibility = isConnected ? Visibility.Visible : Visibility.Collapsed;
