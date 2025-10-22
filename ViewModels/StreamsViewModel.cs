@@ -423,19 +423,16 @@ namespace EncoderApp.ViewModels
         public void MountGotFocus()
         {
             if (Mount == "/Mount")
-            {
-                Mount = "";
-            }
+                Mount = string.Empty;
         }
 
         public void MountLostFocus()
         {
-           
+            // Agar user ne kuch likha hai toh /Mount wapas na aaye
             if (string.IsNullOrWhiteSpace(Mount))
-            {
                 Mount = "/Mount";
-            }
         }
+
         public void UserNameGotFocus()
         {
             if (UserName == "Enter UserName")
@@ -463,7 +460,7 @@ namespace EncoderApp.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Password))
             {
-                Password = "Enter Password";
+                Password = "";
             }
         }
         public void ComboBoxPreviewMouseLeftButtonDown(object sender)

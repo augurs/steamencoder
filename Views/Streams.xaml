@@ -409,7 +409,7 @@
                 </StackPanel>
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Foreground="#94a3b8"/>
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                    <TextBox x:Name="StreamNameTxt" GotFocus="StreamNameTxt_GotFocus" LostFocus="StreamNameTxt_LostFocus" Text="{Binding StreamName}" FontSize="12" Height="28" Margin="0,0,7,0" Padding="5,5,0,3" MinWidth="210" 
+                    <TextBox x:Name="StreamNameTxt" GotFocus="StreamNameTxt_GotFocus" LostFocus="StreamNameTxt_LostFocus" Text="{Binding StreamName, UpdateSourceTrigger=PropertyChanged}" FontSize="12" Height="28" Margin="0,0,7,0" Padding="5,5,0,3" MinWidth="210" 
                              Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                         <TextBox.Resources>
                             <Style TargetType="Border">
@@ -437,7 +437,7 @@
                 </ComboBox>
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Hostname or IP:" Foreground="#94a3b8" Margin="0,15,0,0"/>
                 <TextBox x:Name="HostNameTxt" GotFocus="HostNameTxt_GotFocus" LostFocus="HostNameTxt_LostFocus" Grid.Row="3" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
-                         MinWidth="210" Text="{Binding HostNameOrIP}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                         MinWidth="210" Text="{Binding HostNameOrIP, UpdateSourceTrigger=PropertyChanged}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -465,7 +465,7 @@
                 </Grid>
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Mount:" Foreground="#94a3b8" Margin="0,15,0,0"/>
                 <TextBox x:Name="MountTxt" GotFocus="MountTxt_GotFocus" LostFocus="MountTxt_LostFocus" Grid.Row="5" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
-                         MinWidth="210" Text="{Binding Mount}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                         MinWidth="210" Text="{Binding Mount, UpdateSourceTrigger=PropertyChanged}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -474,7 +474,7 @@
                 </TextBox>
                 <TextBlock Grid.Row="6" Grid.Column="0" Text="UserName:" Foreground="#94a3b8" Margin="0,15,0,0"/>
                 <TextBox x:Name="UserNameTxt" GotFocus="UserNameTxt_GotFocus" LostFocus="UserNameTxt_LostFocus" Grid.Row="6" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3"
-                         MinWidth="210" Text="{Binding UserName}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                         MinWidth="210" Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -483,7 +483,7 @@
                 </TextBox>
                 <TextBlock Grid.Row="7" Grid.Column="0" Text="Password:" Foreground="#94a3b8" Margin="0,15,0,0"/>
                 <TextBox x:Name="PasswordTxt" GotFocus="Pass_GotFoucs" LostFocus="Pass_LostFocus" Grid.Row="7" Grid.Column="1" FontSize="12" Height="28" Margin="0,10,0,5" Padding="5,5,0,3" 
-                         MinWidth="210" Text="{Binding Password}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
+                         MinWidth="210" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}" Foreground="SlateGray" Background="#0b1220" BorderThickness="0">
                     <TextBox.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
