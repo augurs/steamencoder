@@ -18,6 +18,7 @@ using Concentus.Oggfile;
 using Concentus.Structs;
 using System.Windows.Threading;
 using EncoderApp.Views;
+using EncoderApp.Models;
 
 
 namespace EncoderApp.ViewModels
@@ -51,6 +52,9 @@ namespace EncoderApp.ViewModels
                 threshold = (float)Math.Pow(10.0, thresholdDb / 20.0);
                 this.releaseRate = releaseRate;
                 WaveFormat = src.WaveFormat;
+
+
+                
             }
 
             public WaveFormat WaveFormat { get; }
@@ -75,6 +79,9 @@ namespace EncoderApp.ViewModels
         }
         public void StartStreaming(string iceCastUrlive="")
         {
+
+            micEnabled= AppConfigurationManager.ReadValue("AudioInput") == "Yes" ? true : false;
+            systemEnabled=AppConfigurationManager.ReadValue("OthersApplicationInput")=="Yes" ? true : false;
             if (isStreaming)
             {
                 //SetStatus("Already streaming...", "Orange");
@@ -149,6 +156,16 @@ namespace EncoderApp.ViewModels
 
                 var mixer = new MixingSampleProvider(new[] { sysVol, micVol }) { ReadFully = true };
                 var limited = new SmoothLimiter(mixer, -3f, 0.0007f);
+
+
+
+                micEnabled = !micEnabled;
+                if (micVol != null)
+                    micVol.Volume = micEnabled ? 0.95f : 0f;
+
+                systemEnabled = !systemEnabled;
+                if (sysVol != null)
+                    sysVol.Volume = systemEnabled ? 0.85f : 0f;
 
                 // --- Encoder thread ---
                 var encoderThread = new Thread(() =>
